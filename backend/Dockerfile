@@ -2,6 +2,7 @@ FROM golang:latest as development
 WORKDIR /go/src/github.com/koyashiro/postgres-playground
 COPY go.mod go.sum ./
 RUN go mod download
+RUN go get -u github.com/cosmtrek/air
 ENV PORT=80
 COPY . .
 

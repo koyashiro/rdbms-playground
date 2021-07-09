@@ -5,6 +5,8 @@ services:
     build:
       context: backend
       target: development
-    command: go run main.go
+    command: air
+    volumes:
+      - ./backend:/go/src/github.com/koyashiro/postgres-playground
     ports:
       - ${PORT:-8080}:80
