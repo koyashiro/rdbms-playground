@@ -1,0 +1,10 @@
+version: '3.9'
+
+services:
+  backend:
+    build:
+      context: backend
+      target: development
+    command: go run main.go
+    ports:
+      - ${PORT:-8080}:80
