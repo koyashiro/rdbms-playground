@@ -5,7 +5,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"net/http"
-	"os"
 )
 
 func main() {
@@ -23,7 +22,7 @@ func main() {
 	e.POST("/playgrounds/:id/execute", executeQuery)
 
 	// Start server
-	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
+	e.Logger.Fatal(e.Start(":80"))
 }
 
 // Handler
