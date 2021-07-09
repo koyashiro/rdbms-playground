@@ -32,7 +32,7 @@ func hello(c echo.Context) error {
 }
 
 type PlaygroundCreationResponse struct {
-	Id string
+	Id string `json:"id"`
 }
 
 func postPlayground(c echo.Context) error {
@@ -51,16 +51,16 @@ func deletePlayground(c echo.Context) error {
 }
 
 type ExecuteQueryRequest struct {
-	id    string
-	query string
+	Id    string `json:"id"`
+	Query string `json:"query"`
 }
 
 type ExecuteQueryResponse struct {
-	result string
+	Result string `json:"result"`
 }
 
 type ErrorResponse struct {
-	message string
+	Message string `json:"message"`
 }
 
 func executeQuery(c echo.Context) error {
@@ -68,11 +68,11 @@ func executeQuery(c echo.Context) error {
 	req := new(ExecuteQueryRequest)
 	if err := c.Bind(req); err != nil {
 		c.Logger().Error("invalid parameter")
-		return c.JSON(http.StatusBadRequest, ErrorResponse{message: "invalid parameter"})
+		return c.JSON(http.StatusBadRequest, ErrorResponse{Message: "invalid parameter"})
 	}
 
 	res := ExecuteQueryResponse{
-		result: "execution result",
+		Result: "execution result",
 	}
 	c.Logger().Info("execute query: " + id)
 	return c.JSON(http.StatusOK, res)
