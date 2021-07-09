@@ -1,19 +1,23 @@
 <template>
   <v-app>
+    <Header />
+
     <v-main>
-      <HelloWorld />
+      <Playground />
     </v-main>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
+import Header from "./components/Header.vue";
+import Playground from "./components/Playground.vue";
 
 export default {
   name: "App",
 
   components: {
-    HelloWorld,
+    Header,
+    Playground,
   },
 
   data: () => ({
