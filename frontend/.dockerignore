@@ -1,0 +1,5 @@
+Dockerfile
+.DS_Store
+Thumbs.db
+.aleph/
+dist/
