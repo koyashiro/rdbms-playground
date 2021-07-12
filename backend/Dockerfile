@@ -4,6 +4,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 RUN go get -u github.com/cosmtrek/air
 COPY . .
+CMD ["air"]
 
 FROM golang:latest as build
 WORKDIR /go/src/github.com/koyashiro/postgres-playground
