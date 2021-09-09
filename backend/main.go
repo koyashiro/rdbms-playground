@@ -15,6 +15,7 @@ func main() {
 	e.Use(middleware.Recover())
 
 	// Routes
+	e.GET("/playgrounds", handler.GetPlaygrounds)
 	e.POST("/playgrounds", handler.PostPlayground)
 	e.GET("/playgrounds/:id", handler.GetPlayground)
 	e.DELETE("/playgrounds/:id", handler.DeletePlayground)

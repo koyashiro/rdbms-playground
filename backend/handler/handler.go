@@ -11,6 +11,8 @@ import (
 	"strconv"
 )
 
+var playgrounds map[string]*runtime.DB = map[string]*runtime.DB{}
+
 type PlaygroundCreationResponse struct {
 	Id string `json:"id"`
 }
@@ -33,6 +35,11 @@ type ErrorResponse struct {
 	Message string `json:"message"`
 }
 
+func GetPlaygrounds(c echo.Context) error {
+	c.Logger().Info("index playgrounds: ")
+	return c.JSON(http.StatusOK, playgrounds)
+}
+
 func PostPlayground(c echo.Context) error {
 	id := uuid.NewString()
 	dbm := runtime.NewDBManage(client.DefaultDockerHost)
@@ -43,6 +50,7 @@ func PostPlayground(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, res)
 	}
 	c.Logger().Info(db)
+	playgrounds[id] = db
 	return c.JSON(http.StatusOK, db)
 }
 
