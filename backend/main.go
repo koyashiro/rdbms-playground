@@ -21,5 +21,5 @@ func main() {
 	e.POST("/playgrounds/:id/execute", handler.ExecuteQuery)
 
 	// Start server
-	e.Logger.Fatal(e.Start(":80"))
+	e.Logger.Fatal(e.Start(":8080"))
 }
