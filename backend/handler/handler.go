@@ -79,6 +79,7 @@ func DeletePlayground(c echo.Context) error {
 		res := ErrorResponse{Message: err.Error()}
 		return c.JSON(http.StatusInternalServerError, res)
 	}
+	delete(playgrounds, id)
 	return c.JSON(http.StatusNoContent, nil)
 }
 
