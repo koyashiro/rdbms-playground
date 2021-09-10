@@ -2,16 +2,26 @@ package handler
 
 import (
 	"database/sql"
+	"net/http"
+	"strconv"
+
 	"github.com/docker/docker/client"
 	"github.com/google/uuid"
 	"github.com/koyashiro/postgres-playground/backend/runtime"
 	"github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
-	"net/http"
-	"strconv"
 )
 
 var playgrounds map[string]*runtime.DB = map[string]*runtime.DB{}
+
+var dbm runtime.DBManager
+
+func init() {
+	dbm = runtime.NewDBManage(client.DefaultDockerHost)
+	if dbm == nil {
+		panic("fail create database")
+	}
+}
 
 type PlaygroundCreationResponse struct {
 	Id string `json:"id"`
@@ -42,7 +52,6 @@ func GetPlaygrounds(c echo.Context) error {
 
 func PostPlayground(c echo.Context) error {
 	id := uuid.NewString()
-	dbm := runtime.NewDBManage(client.DefaultDockerHost)
 	db, err := dbm.Create(id)
 	if err != nil {
 		c.Logger().Error(err)
@@ -65,7 +74,6 @@ func GetPlayground(c echo.Context) error {
 
 func DeletePlayground(c echo.Context) error {
 	id := c.Param("id")
-	dbm := runtime.NewDBManage(client.DefaultDockerHost)
 	if err := dbm.Destroy(id); err != nil {
 		c.Logger().Error(err)
 		res := ErrorResponse{Message: err.Error()}
