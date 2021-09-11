@@ -1,4 +1,4 @@
-package models
+package model
 
 type Playground struct {
 	ID        string     `json:"id"`

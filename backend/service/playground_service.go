@@ -1,44 +1,44 @@
-package services
+package service
 
 import (
 	"github.com/google/uuid"
 
-	"github.com/koyashiro/postgres-playground/backend/models"
-	"github.com/koyashiro/postgres-playground/backend/repositories"
+	"github.com/koyashiro/postgres-playground/backend/model"
+	"github.com/koyashiro/postgres-playground/backend/repository"
 )
 
 type PlaygroundService interface {
-	GetAll() ([]*models.Playground, error)
-	Get(id string) (*models.Playground, error)
-	Create(db string) (*models.Playground, error)
+	GetAll() ([]*model.Playground, error)
+	Get(id string) (*model.Playground, error)
+	Create(db string) (*model.Playground, error)
 	Destroy(id string) error
 	Execute(id string, query string) (string, error)
 }
 
 type PlaygroundServiceImpl struct {
-	playgroundRepository repositories.PlaygroundRepository
+	playgroundRepository repository.PlaygroundRepository
 }
 
-func NewPlaygroundService(repository *repositories.PlaygroundRepository) PlaygroundService {
+func NewPlaygroundService(repository *repository.PlaygroundRepository) PlaygroundService {
 	return &PlaygroundServiceImpl{playgroundRepository: *repository}
 }
 
-func (s *PlaygroundServiceImpl) GetAll() ([]*models.Playground, error) {
+func (s *PlaygroundServiceImpl) GetAll() ([]*model.Playground, error) {
 	return s.playgroundRepository.GetAll()
 }
 
-func (s *PlaygroundServiceImpl) Get(id string) (*models.Playground, error) {
+func (s *PlaygroundServiceImpl) Get(id string) (*model.Playground, error) {
 	return s.playgroundRepository.Get(id)
 }
 
-func (s *PlaygroundServiceImpl) Create(db string) (*models.Playground, error) {
+func (s *PlaygroundServiceImpl) Create(db string) (*model.Playground, error) {
 	// TODO: create docker container
 
-	p := &models.Playground{
+	p := &model.Playground{
 		ID:      uuid.NewString(),
 		DB:      db,
 		Version: "13.0.0",
-		Container: &models.Container{
+		Container: &model.Container{
 			Hash:   "hash",
 			Image:  "postgres",
 			Status: "running",

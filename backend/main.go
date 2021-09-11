@@ -5,8 +5,8 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 
 	"github.com/koyashiro/postgres-playground/backend/handler"
-	"github.com/koyashiro/postgres-playground/backend/repositories"
-	"github.com/koyashiro/postgres-playground/backend/services"
+	"github.com/koyashiro/postgres-playground/backend/repository"
+	"github.com/koyashiro/postgres-playground/backend/service"
 )
 
 func main() {
@@ -18,8 +18,8 @@ func main() {
 	e.Use(middleware.Recover())
 
 	// TODO: replace DI
-	playgroundRepository := repositories.NewPlaygroundRepository()
-	playgroundServices := services.NewPlaygroundService(&playgroundRepository)
+	playgroundRepository := repository.NewPlaygroundRepository()
+	playgroundServices := service.NewPlaygroundService(&playgroundRepository)
 	playgroundsHandler := handler.NewPlaygroundsHandler(playgroundServices)
 
 	// Routes

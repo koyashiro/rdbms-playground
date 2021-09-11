@@ -5,7 +5,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/koyashiro/postgres-playground/backend/services"
+	"github.com/koyashiro/postgres-playground/backend/service"
 )
 
 type ErrorResponse struct {
@@ -20,10 +20,10 @@ type PlaygroundsHandler interface {
 }
 
 type PlaygroundsHandlerImpl struct {
-	playgroundService services.PlaygroundService
+	playgroundService service.PlaygroundService
 }
 
-func NewPlaygroundsHandler(service services.PlaygroundService) PlaygroundsHandler {
+func NewPlaygroundsHandler(service service.PlaygroundService) PlaygroundsHandler {
 	return &PlaygroundsHandlerImpl{playgroundService: service}
 }
 

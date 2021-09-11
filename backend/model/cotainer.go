@@ -1,4 +1,4 @@
-package models
+package model
 
 type Container struct {
 	Hash   string `json:"hash"`

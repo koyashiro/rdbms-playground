@@ -1,4 +1,4 @@
-package repositories
+package repository
 
 import (
 	"context"
@@ -6,13 +6,13 @@ import (
 
 	"github.com/go-redis/redis/v8"
 
-	"github.com/koyashiro/postgres-playground/backend/models"
+	"github.com/koyashiro/postgres-playground/backend/model"
 )
 
 type PlaygroundRepository interface {
-	GetAll() ([]*models.Playground, error)
-	Get(id string) (*models.Playground, error)
-	Set(p *models.Playground) error
+	GetAll() ([]*model.Playground, error)
+	Get(id string) (*model.Playground, error)
+	Set(p *model.Playground) error
 	Delete(id string) error
 }
 
@@ -35,13 +35,13 @@ func NewPlaygroundRepository() PlaygroundRepository {
 	}
 }
 
-func (r *PlaygroundRepositoryImpl) GetAll() ([]*models.Playground, error) {
+func (r *PlaygroundRepositoryImpl) GetAll() ([]*model.Playground, error) {
 	ids, err := r.client.Keys(r.ctx, "*").Result()
 	if err != nil {
 		return nil, err
 	}
 
-	ps := make([]*models.Playground, 0, len(ids))
+	ps := make([]*model.Playground, 0, len(ids))
 	for _, id := range ids {
 		p, err := r.Get(id)
 		if err != nil {
@@ -53,13 +53,13 @@ func (r *PlaygroundRepositoryImpl) GetAll() ([]*models.Playground, error) {
 	return ps, nil
 }
 
-func (r *PlaygroundRepositoryImpl) Get(id string) (*models.Playground, error) {
+func (r *PlaygroundRepositoryImpl) Get(id string) (*model.Playground, error) {
 	b, err := r.client.Get(r.ctx, id).Bytes()
 	if err != nil {
 		return nil, err
 	}
 
-	var p *models.Playground
+	var p *model.Playground
 	if err = json.Unmarshal(b, &p); err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (r *PlaygroundRepositoryImpl) Get(id string) (*models.Playground, error) {
 	return p, nil
 }
 
-func (r *PlaygroundRepositoryImpl) Set(p *models.Playground) error {
+func (r *PlaygroundRepositoryImpl) Set(p *model.Playground) error {
 	j, err := json.Marshal(p)
 	if err != nil {
 		return err
