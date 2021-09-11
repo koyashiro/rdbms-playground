@@ -18,15 +18,19 @@ func main() {
 	e.Use(middleware.Recover())
 
 	// TODO: replace DI
-	playgroundRepository := repository.NewPlaygroundRepository()
-	playgroundServices := service.NewPlaygroundService(&playgroundRepository)
-	playgroundsHandler := handler.NewPlaygroundsHandler(playgroundServices)
+	pr := repository.NewPlaygroundRepository()
+	cr, err := repository.NewContainerRepository()
+	if err != nil {
+		panic(err)
+	}
+	ps := service.NewPlaygroundService(pr, cr)
+	ph := handler.NewPlaygroundsHandler(ps)
 
 	// Routes
-	e.GET("/playgrounds", playgroundsHandler.GetPlaygrounds)
-	e.GET("/playgrounds/:id", playgroundsHandler.GetPlayground)
-	e.POST("/playgrounds", playgroundsHandler.PostPlayground)
-	e.DELETE("/playgrounds/:id", playgroundsHandler.DeletePlayground)
+	e.GET("/playgrounds", ph.GetPlaygrounds)
+	e.GET("/playgrounds/:id", ph.GetPlayground)
+	e.POST("/playgrounds", ph.PostPlayground)
+	e.DELETE("/playgrounds/:id", ph.DeletePlayground)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8080"))

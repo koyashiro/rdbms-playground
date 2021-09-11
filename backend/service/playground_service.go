@@ -17,10 +17,14 @@ type PlaygroundService interface {
 
 type PlaygroundServiceImpl struct {
 	playgroundRepository repository.PlaygroundRepository
+	containerRepository  repository.ContainerRepository
 }
 
-func NewPlaygroundService(repository *repository.PlaygroundRepository) PlaygroundService {
-	return &PlaygroundServiceImpl{playgroundRepository: *repository}
+func NewPlaygroundService(pr repository.PlaygroundRepository, cr repository.ContainerRepository) PlaygroundService {
+	return &PlaygroundServiceImpl{
+		playgroundRepository: pr,
+		containerRepository:  cr,
+	}
 }
 
 func (s *PlaygroundServiceImpl) GetAll() ([]*model.Playground, error) {
@@ -32,18 +36,16 @@ func (s *PlaygroundServiceImpl) Get(id string) (*model.Playground, error) {
 }
 
 func (s *PlaygroundServiceImpl) Create(db string) (*model.Playground, error) {
-	// TODO: create docker container
+	c, err := s.containerRepository.Create()
+	if err != nil {
+		return nil, err
+	}
 
 	p := &model.Playground{
-		ID:      uuid.NewString(),
-		DB:      db,
-		Version: "13.0.0",
-		Container: &model.Container{
-			Hash:   "hash",
-			Image:  "postgres",
-			Status: "running",
-			Port:   12345,
-		},
+		ID:        uuid.NewString(),
+		DB:        db,
+		Version:   "13.0.0",
+		Container: c,
 	}
 
 	if err := s.playgroundRepository.Set(p); err != nil {
@@ -54,7 +56,14 @@ func (s *PlaygroundServiceImpl) Create(db string) (*model.Playground, error) {
 }
 
 func (s *PlaygroundServiceImpl) Destroy(id string) error {
-	// TODO: remove docker container
+	p, err := s.playgroundRepository.Get(id)
+	if err != nil {
+		return err
+	}
+
+	if err := s.containerRepository.Delete(p.Container.ID); err != nil {
+		return err
+	}
 
 	return s.playgroundRepository.Delete(id)
 }
