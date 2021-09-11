@@ -11,6 +11,7 @@ type PlaygroundRepository interface {
 	GetAll() ([]*models.Playground, error)
 	Get(id string) (*models.Playground, error)
 	Append(playground *models.Playground) error
+	Update(playground *models.Playground) error
 	Delete(id string) error
 }
 
@@ -33,6 +34,11 @@ func (r *PlaygroundRepositoryImpl) Get(id string) (*models.Playground, error) {
 }
 
 func (r *PlaygroundRepositoryImpl) Append(playground *models.Playground) error {
+	playgrounds[playground.ID] = playground
+	return nil
+}
+
+func (r *PlaygroundRepositoryImpl) Update(playground *models.Playground) error {
 	playgrounds[playground.ID] = playground
 	return nil
 }
