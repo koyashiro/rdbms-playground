@@ -10,7 +10,7 @@ import (
 type PlaygroundService interface {
 	GetAll() ([]*models.Playground, error)
 	Get(id string) (*models.Playground, error)
-	Create(db string) error
+	Create(db string) (*models.Playground, error)
 	Destroy(id string) error
 	Execute(id string, query string) (string, error)
 }
@@ -31,12 +31,12 @@ func (s *PlaygroundServiceImpl) Get(id string) (*models.Playground, error) {
 	return s.playgroundRepository.Get(id)
 }
 
-func (s *PlaygroundServiceImpl) Create(db string) error {
+func (s *PlaygroundServiceImpl) Create(db string) (*models.Playground, error) {
 	// TODO: create docker container
 
 	p := &models.Playground{
 		ID:      uuid.NewString(),
-		DB:      "postgres",
+		DB:      db,
 		Version: "13.0.0",
 		Container: &models.Container{
 			Hash:   "hash",
@@ -46,7 +46,11 @@ func (s *PlaygroundServiceImpl) Create(db string) error {
 		},
 	}
 
-	return s.playgroundRepository.Append(p)
+	if err := s.playgroundRepository.Set(p); err != nil {
+		return nil, err
+	}
+
+	return p, nil
 }
 
 func (s *PlaygroundServiceImpl) Destroy(id string) error {
