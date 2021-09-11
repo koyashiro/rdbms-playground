@@ -1,49 +1,76 @@
 package repositories
 
 import (
+	"context"
+	"encoding/json"
+
+	"github.com/go-redis/redis/v8"
+
 	"github.com/koyashiro/postgres-playground/backend/models"
 )
-
-// TODO: replace redis
-var playgrounds map[string]*models.Playground = make(map[string]*models.Playground)
 
 type PlaygroundRepository interface {
 	GetAll() ([]*models.Playground, error)
 	Get(id string) (*models.Playground, error)
-	Append(playground *models.Playground) error
-	Update(playground *models.Playground) error
+	Set(p *models.Playground) error
 	Delete(id string) error
 }
 
-type PlaygroundRepositoryImpl struct{}
+type PlaygroundRepositoryImpl struct {
+	ctx    context.Context
+	client *redis.Client
+}
 
 func NewPlaygroundRepository() PlaygroundRepository {
-	return &PlaygroundRepositoryImpl{}
+	ctx := context.Background()
+	c := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
+	})
+
+	return &PlaygroundRepositoryImpl{
+		ctx:    ctx,
+		client: c,
+	}
 }
 
 func (r *PlaygroundRepositoryImpl) GetAll() ([]*models.Playground, error) {
-	s := make([]*models.Playground, len(playgrounds))
-	for _, v := range playgrounds {
-		s = append(s, v)
+	ids, err := r.client.Keys(r.ctx, "*").Result()
+	if err != nil {
+		return nil, err
 	}
-	return s, nil
+
+	ps := make([]*models.Playground, 10)
+	for _, id := range ids {
+		p, err := r.Get(id)
+		if err != nil {
+			return nil, err
+		}
+		ps = append(ps, p)
+	}
+
+	return ps, nil
 }
 
 func (r *PlaygroundRepositoryImpl) Get(id string) (*models.Playground, error) {
-	return playgrounds[id], nil
+	b, err := r.client.Get(r.ctx, id).Bytes()
+	if err != nil {
+		return nil, err
+	}
+
+	var p *models.Playground
+	if err = json.Unmarshal(b, p); err != nil {
+		return nil, err
+	}
+
+	return p, nil
 }
 
-func (r *PlaygroundRepositoryImpl) Append(playground *models.Playground) error {
-	playgrounds[playground.ID] = playground
-	return nil
-}
-
-func (r *PlaygroundRepositoryImpl) Update(playground *models.Playground) error {
-	playgrounds[playground.ID] = playground
-	return nil
+func (r *PlaygroundRepositoryImpl) Set(p *models.Playground) error {
+	return r.client.Set(r.ctx, p.ID, p, 0).Err()
 }
 
 func (r *PlaygroundRepositoryImpl) Delete(id string) error {
-	delete(playgrounds, id)
-	return nil
+	return r.client.Del(r.ctx, id).Err()
 }
