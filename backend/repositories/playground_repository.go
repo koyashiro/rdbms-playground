@@ -41,7 +41,7 @@ func (r *PlaygroundRepositoryImpl) GetAll() ([]*models.Playground, error) {
 		return nil, err
 	}
 
-	ps := make([]*models.Playground, 10)
+	ps := make([]*models.Playground, len(ids))
 	for _, id := range ids {
 		p, err := r.Get(id)
 		if err != nil {
