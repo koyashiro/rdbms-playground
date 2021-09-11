@@ -41,7 +41,7 @@ func (r *PlaygroundRepositoryImpl) GetAll() ([]*models.Playground, error) {
 		return nil, err
 	}
 
-	ps := make([]*models.Playground, len(ids))
+	ps := make([]*models.Playground, 0, len(ids))
 	for _, id := range ids {
 		p, err := r.Get(id)
 		if err != nil {
@@ -60,7 +60,7 @@ func (r *PlaygroundRepositoryImpl) Get(id string) (*models.Playground, error) {
 	}
 
 	var p *models.Playground
-	if err = json.Unmarshal(b, p); err != nil {
+	if err = json.Unmarshal(b, &p); err != nil {
 		return nil, err
 	}
 
@@ -68,7 +68,12 @@ func (r *PlaygroundRepositoryImpl) Get(id string) (*models.Playground, error) {
 }
 
 func (r *PlaygroundRepositoryImpl) Set(p *models.Playground) error {
-	return r.client.Set(r.ctx, p.ID, p, 0).Err()
+	j, err := json.Marshal(p)
+	if err != nil {
+		return err
+	}
+
+	return r.client.Set(r.ctx, p.ID, j, 0).Err()
 }
 
 func (r *PlaygroundRepositoryImpl) Delete(id string) error {
