@@ -1,8 +1,8 @@
 package models
 
 type Container struct {
-	Hash   string
-	Image  string
-	Status string
-	Port   int
+	Hash   string `json:"hash"`
+	Image  string `json:"image"`
+	Status string `json:"status"`
+	Port   int    `json:"port"`
 }
