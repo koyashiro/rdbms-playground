@@ -18,15 +18,18 @@ type PlaygroundService interface {
 type PlaygroundServiceImpl struct {
 	pr  repository.PlaygroundRepository
 	cr  repository.ContainerRepository
+	dbr repository.DBRepository
 }
 
 func NewPlaygroundService(
 	pr repository.PlaygroundRepository,
 	cr repository.ContainerRepository,
+	dbr repository.DBRepository,
 ) PlaygroundService {
 	return &PlaygroundServiceImpl{
 		pr:  pr,
 		cr:  cr,
+		dbr: dbr,
 	}
 }
 
@@ -72,7 +75,15 @@ func (s *PlaygroundServiceImpl) Destroy(id string) error {
 }
 
 func (s *PlaygroundServiceImpl) Execute(id string, query string) (string, error) {
-	// TODO: execute query
-	result := "XXXXXXXX"
-	return result, nil
+	p, err := s.pr.Get(id)
+	if err != nil {
+		return "", err
+	}
+
+	r, err := s.dbr.Execute(p.Container.Ports[0], query)
+	if err != nil {
+		return "", err
+	}
+
+	return r, nil
 }
