@@ -16,27 +16,30 @@ type PlaygroundService interface {
 }
 
 type PlaygroundServiceImpl struct {
-	playgroundRepository repository.PlaygroundRepository
-	containerRepository  repository.ContainerRepository
+	pr  repository.PlaygroundRepository
+	cr  repository.ContainerRepository
 }
 
-func NewPlaygroundService(pr repository.PlaygroundRepository, cr repository.ContainerRepository) PlaygroundService {
+func NewPlaygroundService(
+	pr repository.PlaygroundRepository,
+	cr repository.ContainerRepository,
+) PlaygroundService {
 	return &PlaygroundServiceImpl{
-		playgroundRepository: pr,
-		containerRepository:  cr,
+		pr:  pr,
+		cr:  cr,
 	}
 }
 
 func (s *PlaygroundServiceImpl) GetAll() ([]*model.Playground, error) {
-	return s.playgroundRepository.GetAll()
+	return s.pr.GetAll()
 }
 
 func (s *PlaygroundServiceImpl) Get(id string) (*model.Playground, error) {
-	return s.playgroundRepository.Get(id)
+	return s.pr.Get(id)
 }
 
 func (s *PlaygroundServiceImpl) Create(db string) (*model.Playground, error) {
-	c, err := s.containerRepository.Create()
+	c, err := s.cr.Create()
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +51,7 @@ func (s *PlaygroundServiceImpl) Create(db string) (*model.Playground, error) {
 		Container: c,
 	}
 
-	if err := s.playgroundRepository.Set(p); err != nil {
+	if err := s.pr.Set(p); err != nil {
 		return nil, err
 	}
 
@@ -56,16 +59,16 @@ func (s *PlaygroundServiceImpl) Create(db string) (*model.Playground, error) {
 }
 
 func (s *PlaygroundServiceImpl) Destroy(id string) error {
-	p, err := s.playgroundRepository.Get(id)
+	p, err := s.pr.Get(id)
 	if err != nil {
 		return err
 	}
 
-	if err := s.containerRepository.Delete(p.Container.ID); err != nil {
+	if err := s.cr.Delete(p.Container.ID); err != nil {
 		return err
 	}
 
-	return s.playgroundRepository.Delete(id)
+	return s.pr.Delete(id)
 }
 
 func (s *PlaygroundServiceImpl) Execute(id string, query string) (string, error) {
