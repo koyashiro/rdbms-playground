@@ -17,6 +17,7 @@ type PlaygroundsHandler interface {
 	GetPlayground(c echo.Context) error
 	PostPlayground(c echo.Context) error
 	DeletePlayground(c echo.Context) error
+	ExecuteQuery(c echo.Context) error
 }
 
 type PlaygroundsHandlerImpl struct {
@@ -70,4 +71,32 @@ func (h *PlaygroundsHandlerImpl) DeletePlayground(c echo.Context) error {
 	}
 
 	return c.NoContent(http.StatusNoContent)
+}
+
+func (h *PlaygroundsHandlerImpl) ExecuteQuery(c echo.Context) error {
+	id := c.Param("id")
+
+	type Query struct {
+		Query string `json:"query"`
+	}
+
+	var q Query
+	if err := c.Bind(&q); err != nil {
+		c.Logger().Error(err)
+		res := ErrorResponse{Error: err.Error()}
+		return c.JSON(http.StatusInternalServerError, res)
+	}
+
+	r, err := h.playgroundService.Execute(id, q.Query)
+	if err != nil {
+		c.Logger().Error(err)
+		res := ErrorResponse{Error: err.Error()}
+		return c.JSON(http.StatusInternalServerError, res)
+	}
+
+	type Result struct {
+		Result string `json:"result"`
+	}
+
+	return c.JSON(http.StatusOK, &Result{Result: r})
 }

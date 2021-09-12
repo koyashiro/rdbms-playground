@@ -23,7 +23,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	ps := service.NewPlaygroundService(pr, cr)
+	dbr := repository.NewPostgresRepository()
+	ps := service.NewPlaygroundService(pr, cr, dbr)
 	ph := handler.NewPlaygroundsHandler(ps)
 
 	// Routes
@@ -31,6 +32,7 @@ func main() {
 	e.GET("/playgrounds/:id", ph.GetPlayground)
 	e.POST("/playgrounds", ph.PostPlayground)
 	e.DELETE("/playgrounds/:id", ph.DeletePlayground)
+	e.POST("/playgrounds/:id/query", ph.ExecuteQuery)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8080"))
