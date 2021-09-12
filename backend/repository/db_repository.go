@@ -23,6 +23,7 @@ func (r *PostgresRepositoryImpl) Execute(port int, query string) (string, error)
 	if err != nil {
 		return "", err
 	}
+	defer db.Close()
 
 	rows, err := db.Query(query)
 	if err != nil {
