@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"strconv"
 	"strings"
+
+	_ "github.com/lib/pq"
 )
 
 type DBRepository interface {
