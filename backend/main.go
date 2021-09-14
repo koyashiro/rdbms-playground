@@ -4,6 +4,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
+	"github.com/koyashiro/postgres-playground/backend/env"
 	"github.com/koyashiro/postgres-playground/backend/handler"
 	"github.com/koyashiro/postgres-playground/backend/repository"
 	"github.com/koyashiro/postgres-playground/backend/service"
@@ -35,5 +36,5 @@ func main() {
 	e.POST("/playgrounds/:id/query", ph.ExecuteQuery)
 
 	// Start server
-	e.Logger.Fatal(e.Start(":80"))
+	e.Logger.Fatal(e.Start(":" + env.Port))
 }

@@ -5,6 +5,9 @@ services:
     build:
       context: backend
       target: development
+    environment:
+      PLAYGROUND_BACKEND_PORT: ${PLAYGROUND_BACKEND_PORT:-80}
+      PLAYGROUND_NETWORK: ${PLAYGROUND_NETWORK:-playground-network}
     volumes:
       - ./backend:/go/src/github.com/koyashiro/postgres-playground
       - /var/run/docker.sock:/var/run/docker.sock
@@ -31,6 +34,10 @@ services:
     depends_on:
       - backend
       - frontend
+
+networks:
+  default:
+    name: ${PLAYGROUND_NETWORK:-playground-network}
 
 volumes:
   node_modules:

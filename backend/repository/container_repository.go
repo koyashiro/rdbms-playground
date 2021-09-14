@@ -9,6 +9,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 
+	"github.com/koyashiro/postgres-playground/backend/env"
 	"github.com/koyashiro/postgres-playground/backend/model"
 )
 
@@ -59,7 +60,7 @@ func (r *ContainerRepositoryImpl) Create(name string) (*model.Container, error) 
 		return nil, err
 	}
 
-	if err := r.client.NetworkConnect(r.ctx, "postgres-playground_default", ccb.ID, nil); err != nil {
+	if err := r.client.NetworkConnect(r.ctx, env.Network, ccb.ID, nil); err != nil {
 		return nil, err
 	}
 
