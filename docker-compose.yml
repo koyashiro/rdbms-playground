@@ -7,6 +7,7 @@ services:
       target: development
     volumes:
       - ./backend:/go/src/github.com/koyashiro/postgres-playground
+      - /var/run/docker.sock:/var/run/docker.sock
 
   frontend:
     build:

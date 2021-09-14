@@ -35,5 +35,5 @@ func main() {
 	e.POST("/playgrounds/:id/query", ph.ExecuteQuery)
 
 	// Start server
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Fatal(e.Start(":80"))
 }
