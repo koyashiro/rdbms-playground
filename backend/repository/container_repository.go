@@ -15,7 +15,7 @@ import (
 
 type ContainerRepository interface {
 	Get(id string) (*model.Container, error)
-	Create() (*model.Container, error)
+	Create(name string) (*model.Container, error)
 	Delete(id string) error
 }
 
@@ -46,17 +46,21 @@ func (r *ContainerRepositoryImpl) Get(id string) (*model.Container, error) {
 	return r.get(id)
 }
 
-func (r *ContainerRepositoryImpl) Create() (*model.Container, error) {
+func (r *ContainerRepositoryImpl) Create(name string) (*model.Container, error) {
 	r.Lock()
 	defer r.Unlock()
 
-	ccb, err := r.create()
+	ccb, err := r.create(name)
 	if err != nil {
 		return nil, err
 	}
 
 	err = r.start(ccb.ID)
 	if err != nil {
+		return nil, err
+	}
+
+	if err := r.client.NetworkConnect(r.ctx, "postgres-playground_default", ccb.ID, nil); err != nil {
 		return nil, err
 	}
 
@@ -112,16 +116,14 @@ func (r *ContainerRepositoryImpl) get(id string) (*model.Container, error) {
 	}, nil
 }
 
-func (r *ContainerRepositoryImpl) create() (container.ContainerCreateCreatedBody, error) {
-	cc := &container.Config{
+func (r *ContainerRepositoryImpl) create(name string) (container.ContainerCreateCreatedBody, error) {
+	c := &container.Config{
 		Image:  "postgres",
 		Labels: map[string]string{"type": "playground"},
 		Env:    []string{"POSTGRES_PASSWORD=password"},
 	}
 
-	hc := &container.HostConfig{PublishAllPorts: true}
-
-	return r.client.ContainerCreate(r.ctx, cc, hc, nil, nil, "")
+	return r.client.ContainerCreate(r.ctx, c, nil, nil, nil, name)
 }
 
 func (r *ContainerRepositoryImpl) start(id string) error {

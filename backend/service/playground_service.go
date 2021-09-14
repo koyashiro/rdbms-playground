@@ -42,13 +42,15 @@ func (s *PlaygroundServiceImpl) Get(id string) (*model.Playground, error) {
 }
 
 func (s *PlaygroundServiceImpl) Create(db string) (*model.Playground, error) {
-	c, err := s.cr.Create()
+	id := uuid.New().String()
+
+	c, err := s.cr.Create(id)
 	if err != nil {
 		return nil, err
 	}
 
 	p := &model.Playground{
-		ID:        uuid.NewString(),
+		ID:        id,
 		DB:        db,
 		Version:   "13.0.0",
 		Container: c,
@@ -75,12 +77,7 @@ func (s *PlaygroundServiceImpl) Destroy(id string) error {
 }
 
 func (s *PlaygroundServiceImpl) Execute(id string, query string) (string, error) {
-	p, err := s.pr.Get(id)
-	if err != nil {
-		return "", err
-	}
-
-	r, err := s.dbr.Execute(p.Container.Ports[0], query)
+	r, err := s.dbr.Execute(id, query)
 	if err != nil {
 		return "", err
 	}

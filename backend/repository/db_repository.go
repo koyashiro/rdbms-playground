@@ -2,14 +2,13 @@ package repository
 
 import (
 	"database/sql"
-	"strconv"
 	"strings"
 
 	_ "github.com/lib/pq"
 )
 
 type DBRepository interface {
-	Execute(port int, query string) (string, error)
+	Execute(namw string, query string) (string, error)
 }
 
 type PostgresRepositoryImpl struct{}
@@ -18,8 +17,8 @@ func NewPostgresRepository() DBRepository {
 	return &PostgresRepositoryImpl{}
 }
 
-func (r *PostgresRepositoryImpl) Execute(port int, query string) (string, error) {
-	db, err := sql.Open("postgres", "user=postgres password=password dbname=postgres sslmode=disable port="+strconv.Itoa(port))
+func (r *PostgresRepositoryImpl) Execute(name string, query string) (string, error) {
+	db, err := sql.Open("postgres", "host="+name+" port=5432 user=postgres password=password dbname=postgres sslmode=disable")
 	if err != nil {
 		return "", err
 	}
