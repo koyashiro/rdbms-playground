@@ -8,7 +8,6 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
-	"github.com/docker/go-connections/nat"
 
 	"github.com/koyashiro/postgres-playground/backend/model"
 )
@@ -94,25 +93,10 @@ func (r *ContainerRepositoryImpl) get(id string) (*model.Container, error) {
 		return nil, err
 	}
 
-	ports := make([]int, 0, len(c.NetworkSettings.Ports))
-	for _, port := range c.NetworkSettings.Ports {
-		if len(port) == 0 {
-			continue
-		}
-
-		p, err := nat.ParsePort(port[0].HostPort)
-		if err != nil {
-			return nil, err
-		}
-
-		ports = append(ports, p)
-	}
-
 	return &model.Container{
 		ID:     id,
 		Image:  c.Image,
 		Status: c.State.Status,
-		Ports:  ports,
 	}, nil
 }
 
