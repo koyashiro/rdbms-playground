@@ -4,10 +4,12 @@ import (
 	"database/sql"
 
 	_ "github.com/lib/pq"
+
+	"github.com/koyashiro/postgres-playground/backend/model"
 )
 
 type DBRepository interface {
-	Execute(name string, query string) ([][]interface{}, error)
+	Execute(name string, query string) (*model.ExecuteResult, error)
 }
 
 type PostgresRepositoryImpl struct{}
@@ -16,7 +18,7 @@ func NewPostgresRepository() DBRepository {
 	return &PostgresRepositoryImpl{}
 }
 
-func (r *PostgresRepositoryImpl) Execute(name string, query string) ([][]interface{}, error) {
+func (r *PostgresRepositoryImpl) Execute(name string, query string) (*model.ExecuteResult, error) {
 	db, err := sql.Open("postgres", "host="+name+" port=5432 user=postgres password=password dbname=postgres sslmode=disable")
 	if err != nil {
 		return nil, err
@@ -34,7 +36,7 @@ func (r *PostgresRepositoryImpl) Execute(name string, query string) ([][]interfa
 		return nil, err
 	}
 
-	result := make([][]interface{}, 0)
+	values := make([][]interface{}, 0)
 
 	ptrs := make([]interface{}, len(types))
 
@@ -48,8 +50,13 @@ func (r *PostgresRepositoryImpl) Execute(name string, query string) ([][]interfa
 			return nil, err
 		}
 
-		result = append(result, row)
+		values = append(values, row)
 	}
 
-	return result, nil
+	columns := make([]*model.Column, len(types), len(types))
+	for i := range columns {
+		columns[i] = model.NewColumn(types[i])
+	}
+
+	return &model.ExecuteResult{Columns: columns, Rows: values}, nil
 }

@@ -94,9 +94,5 @@ func (h *PlaygroundsHandlerImpl) ExecuteQuery(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, res)
 	}
 
-	type Result struct {
-		Result [][]interface{} `json:"result"`
-	}
-
-	return c.JSON(http.StatusOK, &Result{Result: r})
+	return c.JSON(http.StatusOK, r)
 }
