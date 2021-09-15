@@ -2,6 +2,8 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
+	"reflect"
 	"strings"
 
 	_ "github.com/lib/pq"
@@ -30,13 +32,40 @@ func (r *PostgresRepositoryImpl) Execute(name string, query string) (string, err
 	}
 	defer rows.Close()
 
+	types, err := rows.ColumnTypes()
+	if err != nil {
+		return "", err
+	}
+
+	valuesPtrs := make([]interface{}, len(types))
+
 	var sb strings.Builder
-	var dest string
 	for rows.Next() {
-		if err = rows.Scan(&dest); err != nil {
+		values := make([]interface{}, len(types))
+		for i := range values {
+			valuesPtrs[i] = &values[i]
+		}
+
+		if err = rows.Scan(valuesPtrs...); err != nil {
 			return "", err
 		}
-		sb.WriteString(dest)
+
+		types[0].DatabaseTypeName()
+
+		valueStrs := make([]string, len(types), len(types))
+		for i, value := range values {
+			switch v := value.(type) {
+			case int32, int64, float32, float64:
+				valueStrs[i] = fmt.Sprint(v)
+			case []byte:
+				valueStrs[i] = string(v)
+			case string:
+				valueStrs[i] = "\"" + v + "\""
+			default:
+				return "", fmt.Errorf("type: %s, value: %v", reflect.TypeOf(v), v)
+			}
+		}
+		sb.WriteString(strings.Join(valueStrs, ", "))
 	}
 
 	return sb.String(), nil
