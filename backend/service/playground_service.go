@@ -12,7 +12,7 @@ type PlaygroundService interface {
 	Get(id string) (*model.Playground, error)
 	Create(db string) (*model.Playground, error)
 	Destroy(id string) error
-	Execute(id string, query string) (string, error)
+	Execute(id string, query string) ([][]interface{}, error)
 }
 
 type PlaygroundServiceImpl struct {
@@ -76,10 +76,10 @@ func (s *PlaygroundServiceImpl) Destroy(id string) error {
 	return s.pr.Delete(id)
 }
 
-func (s *PlaygroundServiceImpl) Execute(id string, query string) (string, error) {
+func (s *PlaygroundServiceImpl) Execute(id string, query string) ([][]interface{}, error) {
 	r, err := s.dbr.Execute(id, query)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	return r, nil

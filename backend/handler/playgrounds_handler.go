@@ -95,7 +95,7 @@ func (h *PlaygroundsHandlerImpl) ExecuteQuery(c echo.Context) error {
 	}
 
 	type Result struct {
-		Result string `json:"result"`
+		Result [][]interface{} `json:"result"`
 	}
 
 	return c.JSON(http.StatusOK, &Result{Result: r})
