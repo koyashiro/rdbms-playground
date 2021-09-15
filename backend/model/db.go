@@ -14,11 +14,11 @@ type ExecuteResult struct {
 
 // sql.ColumnType wrapper
 type Column struct {
-	columnType *sql.ColumnType
+	*sql.ColumnType
 }
 
 func NewColumn(ct *sql.ColumnType) *Column {
-	return &Column{columnType: ct}
+	return &Column{ColumnType: ct}
 }
 
 func (c *Column) MarshalJSON() ([]byte, error) {
@@ -32,7 +32,7 @@ func (c *Column) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	if _, err := b.WriteString("\"" + c.columnType.Name() + "\""); err != nil {
+	if _, err := b.WriteString("\"" + c.Name() + "\""); err != nil {
 		return nil, err
 	}
 
@@ -44,11 +44,11 @@ func (c *Column) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 
-	if _, err := b.WriteString("\"" + c.columnType.DatabaseTypeName() + "\""); err != nil {
+	if _, err := b.WriteString("\"" + c.DatabaseTypeName() + "\""); err != nil {
 		return nil, err
 	}
 
-	if nullable, ok := c.columnType.Nullable(); ok {
+	if nullable, ok := c.Nullable(); ok {
 		if err := b.WriteByte(','); err != nil {
 			return nil, err
 		}
@@ -62,7 +62,7 @@ func (c *Column) MarshalJSON() ([]byte, error) {
 		}
 	}
 
-	if length, ok := c.columnType.Length(); ok {
+	if length, ok := c.Length(); ok {
 		if err := b.WriteByte(','); err != nil {
 			return nil, err
 		}
@@ -76,7 +76,7 @@ func (c *Column) MarshalJSON() ([]byte, error) {
 		}
 	}
 
-	if precision, scale, ok := c.columnType.DecimalSize(); ok {
+	if precision, scale, ok := c.DecimalSize(); ok {
 		if err := b.WriteByte(','); err != nil {
 			return nil, err
 		}
