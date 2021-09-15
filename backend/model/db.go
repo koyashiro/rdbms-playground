@@ -1,33 +1,110 @@
 package model
 
-import "database/sql"
+import (
+	"bytes"
+	"database/sql"
+	"fmt"
+	"strconv"
+)
 
 type ExecuteResult struct {
 	Columns []*Column       `json:"columns"`
 	Rows    [][]interface{} `json:"rows"`
 }
 
-// TODO: support Length, Precision and Scale
+// sql.ColumnType wrapper
 type Column struct {
-	Name     string `json:"name"`
-	Nullable bool   `json:"nullable"`
-	// Length       int64  `json:"length"`
-	DatabaseType string `json:"databaseType"`
-	// Precision    int64  `json:"precision"`
-	// Scale        int64  `json:"scale"`
+	columnType *sql.ColumnType
 }
 
 func NewColumn(ct *sql.ColumnType) *Column {
-	name := ct.Name()
-	nullable, ok := ct.Nullable()
-	if ok != false {
-		panic("nullable is not supported")
-	}
-	databaseType := ct.DatabaseTypeName()
+	return &Column{columnType: ct}
+}
 
-	return &Column{
-		Name:         name,
-		Nullable:     nullable,
-		DatabaseType: databaseType,
+func (c *Column) MarshalJSON() ([]byte, error) {
+	var b bytes.Buffer
+
+	if err := b.WriteByte('{'); err != nil {
+		return nil, err
 	}
+
+	if _, err := b.WriteString("\"name\":"); err != nil {
+		return nil, err
+	}
+
+	if _, err := b.WriteString("\"" + c.columnType.Name() + "\""); err != nil {
+		return nil, err
+	}
+
+	if err := b.WriteByte(','); err != nil {
+		return nil, err
+	}
+
+	if _, err := b.WriteString("\"databaseType\":"); err != nil {
+		return nil, err
+	}
+
+	if _, err := b.WriteString("\"" + c.columnType.DatabaseTypeName() + "\""); err != nil {
+		return nil, err
+	}
+
+	if nullable, ok := c.columnType.Nullable(); ok {
+		if err := b.WriteByte(','); err != nil {
+			return nil, err
+		}
+
+		if _, err := b.WriteString("\"nullable\":"); err != nil {
+			return nil, err
+		}
+
+		if _, err := b.WriteString(strconv.FormatBool(nullable)); err != nil {
+			return nil, err
+		}
+	}
+
+	if length, ok := c.columnType.Length(); ok {
+		if err := b.WriteByte(','); err != nil {
+			return nil, err
+		}
+
+		if _, err := b.WriteString("\"length\":"); err != nil {
+			return nil, err
+		}
+
+		if _, err := b.WriteString(fmt.Sprint(length)); err != nil {
+			return nil, err
+		}
+	}
+
+	if precision, scale, ok := c.columnType.DecimalSize(); ok {
+		if err := b.WriteByte(','); err != nil {
+			return nil, err
+		}
+
+		if _, err := b.WriteString("\"precision\":"); err != nil {
+			return nil, err
+		}
+
+		if _, err := b.WriteString(fmt.Sprint(precision)); err != nil {
+			return nil, err
+		}
+
+		if err := b.WriteByte(','); err != nil {
+			return nil, err
+		}
+
+		if _, err := b.WriteString("\"scale\":"); err != nil {
+			return nil, err
+		}
+
+		if _, err := b.WriteString(fmt.Sprint(scale)); err != nil {
+			return nil, err
+		}
+	}
+
+	if err := b.WriteByte('}'); err != nil {
+		return nil, err
+	}
+
+	return b.Bytes(), nil
 }
