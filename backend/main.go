@@ -4,11 +4,12 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	"github.com/koyashiro/postgres-playground/backend/env"
 	"github.com/koyashiro/postgres-playground/backend/handler"
 	"github.com/koyashiro/postgres-playground/backend/repository"
 	"github.com/koyashiro/postgres-playground/backend/service"
 )
+
+const port = "1323"
 
 func main() {
 	// Echo instance
@@ -36,5 +37,5 @@ func main() {
 	e.POST("/playgrounds/:id/query", ph.ExecuteQuery)
 
 	// Start server
-	e.Logger.Fatal(e.Start(":" + env.Port))
+	e.Logger.Fatal(e.Start(":" + port))
 }

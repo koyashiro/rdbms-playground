@@ -6,11 +6,12 @@ services:
       context: backend
       target: development
     environment:
-      PLAYGROUND_BACKEND_PORT: ${PLAYGROUND_BACKEND_PORT:-80}
       PLAYGROUND_NETWORK: ${PLAYGROUND_NETWORK:-playground-network}
     volumes:
       - ./backend:/go/src/github.com/koyashiro/postgres-playground
       - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 1323:1323
 
   frontend:
     build:
@@ -24,16 +25,6 @@ services:
 
   redis:
     image: redis:latest
-
-  nginx:
-    image: nginx:latest
-    ports:
-      - ${PORT:-8080}:80
-    volumes:
-      - ./nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro
-    depends_on:
-      - backend
-      - frontend
 
 networks:
   default:
