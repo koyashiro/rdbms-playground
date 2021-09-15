@@ -10,7 +10,7 @@ import (
 )
 
 type DBRepository interface {
-	Execute(namw string, query string) (string, error)
+	Execute(name string, query string) (string, error)
 }
 
 type PostgresRepositoryImpl struct{}
