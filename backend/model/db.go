@@ -27,22 +27,16 @@ func NewExportColumn(ct *sql.ColumnType) *ExportColumn {
 	var nullable interface{}
 	if n, ok := ct.Nullable(); ok {
 		nullable = n
-	} else {
-		nullable = interface{}(nil)
 	}
 
 	var length interface{}
 	if l, ok := ct.Length(); ok {
 		length = l
-	} else {
-		length = interface{}(nil)
 	}
 
 	var precision, scale interface{}
 	if p, s, ok := ct.DecimalSize(); ok {
 		precision, scale = p, s
-	} else {
-		precision, scale = interface{}(nil), interface{}(nil)
 	}
 
 	return &ExportColumn{
