@@ -15,18 +15,35 @@ type Column struct {
 }
 
 type ExportColumn struct {
-	Name         string `json:"name"`
-	DatabaseType string `json:"databaseType"`
-	Nullable     bool   `json:"nullable,omitempty"`
-	Length       int64  `json:"length,omitempty"`
-	Precision    int64  `json:"precision,omitempty"`
-	Scale        int64  `json:"scale,omitempty"`
+	Name         string      `json:"name"`
+	DatabaseType interface{} `json:"databaseType"`
+	Nullable     interface{} `json:"nullable,omitempty"`
+	Length       interface{} `json:"length,omitempty"`
+	Precision    interface{} `json:"precision,omitempty"`
+	Scale        interface{} `json:"scale,omitempty"`
 }
 
 func NewColumn(ct *sql.ColumnType) *ExportColumn {
-	nullable, _ := ct.Nullable()
-	length, _ := ct.Length()
-	precision, scale, _ := ct.DecimalSize()
+	var nullable interface{}
+	if n, ok := ct.Nullable(); ok {
+		nullable = n
+	} else {
+		nullable = interface{}(nil)
+	}
+
+	var length interface{}
+	if l, ok := ct.Length(); ok {
+		length = l
+	} else {
+		length = interface{}(nil)
+	}
+
+	var precision, scale interface{}
+	if p, s, ok := ct.DecimalSize(); ok {
+		precision, scale = p, s
+	} else {
+		precision, scale = interface{}(nil), interface{}(nil)
+	}
 
 	return &ExportColumn{
 		Name:         ct.Name(),
