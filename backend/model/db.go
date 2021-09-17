@@ -1,14 +1,11 @@
 package model
 
 import (
-	"bytes"
 	"database/sql"
-	"fmt"
-	"strconv"
 )
 
 type ExecuteResult struct {
-	Columns []*Column       `json:"columns"`
+	Columns []*ExportColumn `json:"columns"`
 	Rows    [][]interface{} `json:"rows"`
 }
 
@@ -17,94 +14,43 @@ type Column struct {
 	*sql.ColumnType
 }
 
-func NewColumn(ct *sql.ColumnType) *Column {
-	return &Column{ColumnType: ct}
+type ExportColumn struct {
+	Name         string      `json:"name"`
+	DatabaseType interface{} `json:"databaseType"`
+	Nullable     interface{} `json:"nullable,omitempty"`
+	Length       interface{} `json:"length,omitempty"`
+	Precision    interface{} `json:"precision,omitempty"`
+	Scale        interface{} `json:"scale,omitempty"`
 }
 
-func (c *Column) MarshalJSON() ([]byte, error) {
-	var b bytes.Buffer
-
-	if err := b.WriteByte('{'); err != nil {
-		return nil, err
+func NewExportColumn(ct *sql.ColumnType) *ExportColumn {
+	var nullable interface{}
+	if n, ok := ct.Nullable(); ok {
+		nullable = n
+	} else {
+		nullable = interface{}(nil)
 	}
 
-	if _, err := b.WriteString("\"name\":"); err != nil {
-		return nil, err
+	var length interface{}
+	if l, ok := ct.Length(); ok {
+		length = l
+	} else {
+		length = interface{}(nil)
 	}
 
-	if _, err := b.WriteString("\"" + c.Name() + "\""); err != nil {
-		return nil, err
+	var precision, scale interface{}
+	if p, s, ok := ct.DecimalSize(); ok {
+		precision, scale = p, s
+	} else {
+		precision, scale = interface{}(nil), interface{}(nil)
 	}
 
-	if err := b.WriteByte(','); err != nil {
-		return nil, err
+	return &ExportColumn{
+		Name:         ct.Name(),
+		DatabaseType: ct.DatabaseTypeName(),
+		Nullable:     nullable,
+		Length:       length,
+		Precision:    precision,
+		Scale:        scale,
 	}
-
-	if _, err := b.WriteString("\"databaseType\":"); err != nil {
-		return nil, err
-	}
-
-	if _, err := b.WriteString("\"" + c.DatabaseTypeName() + "\""); err != nil {
-		return nil, err
-	}
-
-	if nullable, ok := c.Nullable(); ok {
-		if err := b.WriteByte(','); err != nil {
-			return nil, err
-		}
-
-		if _, err := b.WriteString("\"nullable\":"); err != nil {
-			return nil, err
-		}
-
-		if _, err := b.WriteString(strconv.FormatBool(nullable)); err != nil {
-			return nil, err
-		}
-	}
-
-	if length, ok := c.Length(); ok {
-		if err := b.WriteByte(','); err != nil {
-			return nil, err
-		}
-
-		if _, err := b.WriteString("\"length\":"); err != nil {
-			return nil, err
-		}
-
-		if _, err := b.WriteString(fmt.Sprint(length)); err != nil {
-			return nil, err
-		}
-	}
-
-	if precision, scale, ok := c.DecimalSize(); ok {
-		if err := b.WriteByte(','); err != nil {
-			return nil, err
-		}
-
-		if _, err := b.WriteString("\"precision\":"); err != nil {
-			return nil, err
-		}
-
-		if _, err := b.WriteString(fmt.Sprint(precision)); err != nil {
-			return nil, err
-		}
-
-		if err := b.WriteByte(','); err != nil {
-			return nil, err
-		}
-
-		if _, err := b.WriteString("\"scale\":"); err != nil {
-			return nil, err
-		}
-
-		if _, err := b.WriteString(fmt.Sprint(scale)); err != nil {
-			return nil, err
-		}
-	}
-
-	if err := b.WriteByte('}'); err != nil {
-		return nil, err
-	}
-
-	return b.Bytes(), nil
 }

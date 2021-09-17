@@ -53,9 +53,9 @@ func (r *PostgresRepositoryImpl) Execute(name string, query string) (*model.Exec
 		values = append(values, row)
 	}
 
-	columns := make([]*model.Column, len(types), len(types))
+	columns := make([]*model.ExportColumn, len(types), len(types))
 	for i := range columns {
-		columns[i] = model.NewColumn(types[i])
+		columns[i] = model.NewExportColumn(types[i])
 	}
 
 	return &model.ExecuteResult{Columns: columns, Rows: values}, nil
