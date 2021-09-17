@@ -23,7 +23,7 @@ type ExportColumn struct {
 	Scale        interface{} `json:"scale,omitempty"`
 }
 
-func NewColumn(ct *sql.ColumnType) *ExportColumn {
+func NewExportColumn(ct *sql.ColumnType) *ExportColumn {
 	var nullable interface{}
 	if n, ok := ct.Nullable(); ok {
 		nullable = n
