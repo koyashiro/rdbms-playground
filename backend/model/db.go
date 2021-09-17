@@ -5,7 +5,7 @@ import (
 )
 
 type ExecuteResult struct {
-	Columns []*ExportColumn       `json:"columns"`
+	Columns []*ExportColumn `json:"columns"`
 	Rows    [][]interface{} `json:"rows"`
 }
 
@@ -15,12 +15,12 @@ type Column struct {
 }
 
 type ExportColumn struct {
-	Name  string `json:"name"`
+	Name         string `json:"name"`
 	DatabaseType string `json:"databaseType"`
-	Nullable bool `json:"nullable,omitempty"`
-	Length int64 `json:"length,omitempty"`
-	Precision int64 `json:"precision,omitempty"`
-	Scale int64 `json:"scale,omitempty"`
+	Nullable     bool   `json:"nullable,omitempty"`
+	Length       int64  `json:"length,omitempty"`
+	Precision    int64  `json:"precision,omitempty"`
+	Scale        int64  `json:"scale,omitempty"`
 }
 
 func NewColumn(ct *sql.ColumnType) *ExportColumn {
@@ -29,11 +29,11 @@ func NewColumn(ct *sql.ColumnType) *ExportColumn {
 	precision, scale, _ := ct.DecimalSize()
 
 	return &ExportColumn{
-		Name: ct.Name(),
+		Name:         ct.Name(),
 		DatabaseType: ct.DatabaseTypeName(),
-		Nullable: nullable,
-		Length: length,
-		Precision: precision,
-		Scale: scale,
+		Nullable:     nullable,
+		Length:       length,
+		Precision:    precision,
+		Scale:        scale,
 	}
 }
