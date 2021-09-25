@@ -71,7 +71,7 @@ export const deletePlayground = async (
   const res = await fetchApi("DELETE", `/playgrounds/${id}`, {});
   const json = await res.json();
 
-  if (res.ok) return json as ErrorResponse;
+  if (!res.ok) return json as ErrorResponse;
   return {};
 };
 
@@ -82,6 +82,6 @@ export const postPlaygroundQuery = async (
   const res = await fetchApi("POST", `/playgrounds/${id}/query`, { body });
   const json = await res.json();
 
-  if (res.ok) return json as ErrorResponse;
+  if (!res.ok) return json as ErrorResponse;
   return json as ExecuteResult;
 };
