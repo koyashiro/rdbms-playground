@@ -9,7 +9,7 @@ import (
 )
 
 type ErrorResponse struct {
-	Error string `json:"message"`
+	Error string `json:"error"`
 }
 
 type PlaygroundsHandler interface {
