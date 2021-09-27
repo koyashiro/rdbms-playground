@@ -9,11 +9,6 @@ type ExecuteResult struct {
 	Rows    [][]interface{} `json:"rows"`
 }
 
-// sql.ColumnType wrapper
-type Column struct {
-	*sql.ColumnType
-}
-
 type ExportColumn struct {
 	Name         string `json:"name"`
 	DatabaseType string `json:"databaseType"`
