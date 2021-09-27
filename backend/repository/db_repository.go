@@ -3,8 +3,6 @@ package repository
 import (
 	"database/sql"
 
-	_ "github.com/lib/pq"
-
 	"github.com/koyashiro/postgres-playground/backend/model"
 )
 
@@ -12,14 +10,8 @@ type DBRepository interface {
 	Execute(name string, query string) (*model.ExecuteResult, error)
 }
 
-type PostgresRepositoryImpl struct{}
-
-func NewPostgresRepository() DBRepository {
-	return &PostgresRepositoryImpl{}
-}
-
-func (r *PostgresRepositoryImpl) Execute(name string, query string) (*model.ExecuteResult, error) {
-	db, err := sql.Open("postgres", "host="+name+" port=5432 user=postgres password=password dbname=postgres sslmode=disable")
+func Execute(driverName string, dataSourceName string, query string) (*model.ExecuteResult, error) {
+	db, err := sql.Open(driverName, dataSourceName)
 	if err != nil {
 		return nil, err
 	}
