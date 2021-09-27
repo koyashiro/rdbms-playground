@@ -52,7 +52,18 @@ func (h *PlaygroundsHandlerImpl) GetPlayground(c echo.Context) error {
 }
 
 func (h *PlaygroundsHandlerImpl) PostPlayground(c echo.Context) error {
-	p, err := h.playgroundService.Create("postgres")
+	type Create struct {
+		Db string `json:"db"`
+	}
+
+	var create Create
+	if err := c.Bind(&create); err != nil {
+		c.Logger().Error(err)
+		res := ErrorResponse{Error: err.Error()}
+		return c.JSON(http.StatusInternalServerError, res)
+	}
+
+	p, err := h.playgroundService.Create(create.Db)
 	if err != nil {
 		c.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}

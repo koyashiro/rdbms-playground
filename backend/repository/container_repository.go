@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"time"
 
@@ -13,9 +14,24 @@ import (
 	"github.com/koyashiro/postgres-playground/backend/model"
 )
 
+const password = "password"
+
+var configs = map[string]*container.Config{
+	"mysql": {
+		Image:  "mysql",
+		Labels: map[string]string{"type": "playground"},
+		Env:    []string{"MYSQL_ROOT_PASSWORD=" + password},
+	},
+	"postgres": {
+		Image:  "postgres",
+		Labels: map[string]string{"type": "playground"},
+		Env:    []string{"POSTGRES_PASSWORD=" + password},
+	},
+}
+
 type ContainerRepository interface {
 	Get(id string) (*model.Container, error)
-	Create(name string) (*model.Container, error)
+	Create(name string, db string) (*model.Container, error)
 	Delete(id string) error
 }
 
@@ -46,11 +62,11 @@ func (r *ContainerRepositoryImpl) Get(id string) (*model.Container, error) {
 	return r.get(id)
 }
 
-func (r *ContainerRepositoryImpl) Create(name string) (*model.Container, error) {
+func (r *ContainerRepositoryImpl) Create(name string, db string) (*model.Container, error) {
 	r.Lock()
 	defer r.Unlock()
 
-	ccb, err := r.create(name)
+	ccb, err := r.create(name, db)
 	if err != nil {
 		return nil, err
 	}
@@ -101,11 +117,10 @@ func (r *ContainerRepositoryImpl) get(id string) (*model.Container, error) {
 	}, nil
 }
 
-func (r *ContainerRepositoryImpl) create(name string) (container.ContainerCreateCreatedBody, error) {
-	c := &container.Config{
-		Image:  "postgres",
-		Labels: map[string]string{"type": "playground"},
-		Env:    []string{"POSTGRES_PASSWORD=password"},
+func (r *ContainerRepositoryImpl) create(name string, db string) (container.ContainerCreateCreatedBody, error) {
+	c, ok := configs[db]
+	if !ok {
+		return container.ContainerCreateCreatedBody{}, errors.New("invalid db")
 	}
 
 	return r.client.ContainerCreate(r.ctx, c, nil, nil, nil, name)

@@ -44,7 +44,7 @@ func (s *PlaygroundServiceImpl) Get(id string) (*model.Playground, error) {
 func (s *PlaygroundServiceImpl) Create(db string) (*model.Playground, error) {
 	id := uuid.New().String()
 
-	c, err := s.cr.Create(id)
+	c, err := s.cr.Create(id, db)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (s *PlaygroundServiceImpl) Create(db string) (*model.Playground, error) {
 	p := &model.Playground{
 		ID:        id,
 		DB:        db,
-		Version:   "13.0.0",
+		Version:   "latest",
 		Container: c,
 	}
 
