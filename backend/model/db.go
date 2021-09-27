@@ -34,11 +34,9 @@ func NewExportColumn(ct *sql.ColumnType) *Column {
 		precision, scale = &p, &s
 	}
 
-	databaseType := ct.DatabaseTypeName()
-
 	return &Column{
 		Name:         ct.Name(),
-		DatabaseType: databaseType,
+		DatabaseType: ct.DatabaseTypeName(),
 		Nullable:     nullable,
 		Length:       length,
 		Precision:    precision,
