@@ -3,7 +3,7 @@ import {
   createRef,
   FC,
   KeyboardEventHandler,
-  TextareaHTMLAttributes,
+  useEffect,
   useState,
 } from "react";
 
@@ -20,7 +20,9 @@ const Terminal: FC<Props> = (props) => {
   const [textareaContent, setTextareaContent] = useState<string>("");
   const [textareaRows, setTextareaRows] = useState<number>(1);
 
-  const focusRef = createRef<HTMLTextAreaElement>();
+  const textareaRef = createRef<HTMLTextAreaElement>();
+
+  useEffect(() => textareaRef.current?.scrollIntoView(), [textareaRef, textareaRows]);
 
   const addHistory = (line: string) => {
     setHistory(history + line);
@@ -49,6 +51,8 @@ const Terminal: FC<Props> = (props) => {
       default:
         break;
     }
+
+    textareaRef.current?.scrollIntoView();
   };
 
   return (
@@ -63,7 +67,7 @@ const Terminal: FC<Props> = (props) => {
             onChange={handleChange}
             onKeyPress={handleKeyPress}
             value={textareaContent}
-            ref={focusRef}
+            ref={textareaRef}
           />
         </div>
       </div>
