@@ -37,15 +37,15 @@ const Terminal: FC<Props> = (props) => {
   ) => {
     switch (e.key) {
       case "Enter":
-        if (e.shiftKey) {
-          setTextareaRows(textareaRows + 1);
-        } else {
+        if (textareaContent.trimEnd().endsWith(";")) {
           e.preventDefault();
 
           const res = await props.command(textareaContent);
           addHistory(`> ${textareaContent}\n${res}\n`);
 
           setTextareaContent("");
+        } else {
+          setTextareaRows(textareaRows + 1);
         }
         break;
       default:
