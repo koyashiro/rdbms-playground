@@ -26,7 +26,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	dbr := repository.NewPostgresRepository()
+	dbr := repository.NewDBRepository()
 	ps := service.NewPlaygroundService(pr, cr, dbr)
 	ph := handler.NewPlaygroundsHandler(ps)
 

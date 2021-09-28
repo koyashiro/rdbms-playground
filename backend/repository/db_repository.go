@@ -2,15 +2,42 @@ package repository
 
 import (
 	"database/sql"
+	"errors"
+
+	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 
 	"github.com/koyashiro/postgres-playground/backend/model"
 )
 
-type DBRepository interface {
-	Execute(name string, query string) (*model.ExecuteResult, error)
+func dataSourceName(driverName string, host string) (string, error) {
+	switch driverName {
+	case "postgres":
+		return "host=" + host + " port=5432 user=postgres password=password dbname=postgres sslmode=disable", nil
+	case "mysql":
+		return "root:password@tcp(" + host + ":3306)/mysql", nil
+	default:
+		return "", errors.New("invalid driverName")
+	}
 }
 
-func Execute(driverName string, dataSourceName string, query string) (*model.ExecuteResult, error) {
+type DBRepository interface {
+	Execute(playground *model.Playground, query string) (*model.ExecuteResult, error)
+}
+
+type DBRepositoryImpl struct{}
+
+func NewDBRepository() DBRepository {
+	return &DBRepositoryImpl{}
+}
+
+func (dr DBRepositoryImpl) Execute(playground *model.Playground, query string) (*model.ExecuteResult, error) {
+	driverName := playground.DB
+	dataSourceName, err := dataSourceName(driverName, playground.ID)
+	if err != nil {
+		return nil, err
+	}
+
 	db, err := sql.Open(driverName, dataSourceName)
 	if err != nil {
 		return nil, err

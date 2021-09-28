@@ -77,7 +77,12 @@ func (s *PlaygroundServiceImpl) Destroy(id string) error {
 }
 
 func (s *PlaygroundServiceImpl) Execute(id string, query string) (*model.ExecuteResult, error) {
-	r, err := s.dbr.Execute(id, query)
+	p, err := s.Get(id)
+	if err != nil {
+		return nil, err
+	}
+
+	r, err := s.dbr.Execute(p, query)
 	if err != nil {
 		return nil, err
 	}
