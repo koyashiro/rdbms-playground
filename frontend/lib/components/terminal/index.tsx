@@ -15,6 +15,8 @@ const defaultHistory = `
 Welcome to Postgres Playground!
 `;
 
+const commandLinePrefix = "> ";
+
 const Terminal: FC<Props> = (props) => {
   const [history, setHistory] = useState<string>(defaultHistory);
   const [textareaContent, setTextareaContent] = useState<string>("");
@@ -22,7 +24,10 @@ const Terminal: FC<Props> = (props) => {
 
   const textareaRef = createRef<HTMLTextAreaElement>();
 
-  useEffect(() => textareaRef.current?.scrollIntoView(), [textareaRef, textareaRows]);
+  useEffect(
+    () => textareaRef.current?.scrollIntoView(),
+    [textareaRef, textareaRows]
+  );
 
   const addHistory = (line: string) => {
     setHistory(history + line);
@@ -41,9 +46,13 @@ const Terminal: FC<Props> = (props) => {
           e.preventDefault();
 
           const res = await props.command(textareaContent);
-          addHistory(`> ${textareaContent}\n${res}\n`);
+          const history = textareaContent
+            .split("\n")
+            .join(`\n${" ".repeat(commandLinePrefix.length)}`);
+          addHistory(`${commandLinePrefix}${history}\n${res}\n`);
 
           setTextareaContent("");
+          setTextareaRows(1);
         } else {
           setTextareaRows(textareaRows + 1);
         }
@@ -51,16 +60,14 @@ const Terminal: FC<Props> = (props) => {
       default:
         break;
     }
-
-    textareaRef.current?.scrollIntoView();
   };
 
   return (
     <>
-      <div className="flex flex-col w-full h-full bg-black text-green-500 font-mono text-base">
+      <div className="flex flex-col w-full h-full overflow-x-hidden overflow-y-scroll bg-black text-green-500 font-mono text-base">
         <pre>{history}</pre>
         <div className="flex w-full">
-          <pre className="flex-initial">{"> "}</pre>
+          <pre className="flex-initial">{commandLinePrefix}</pre>
           <textarea
             className="flex-auto outline-none bg-black text-green-500 font-mono text-base"
             rows={textareaRows}
