@@ -18,9 +18,12 @@ Welcome to Postgres Playground!
 const commandLinePrefix = "> ";
 
 const Terminal: FC<Props> = (props) => {
-  const [history, setHistory] = useState<string>(defaultHistory);
+  const [mergedHistory, setMergedHistory] = useState<string>(defaultHistory);
+  const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [textareaContent, setTextareaContent] = useState<string>("");
   const [textareaRows, setTextareaRows] = useState<number>(1);
+  const [commandHistoryInvertedIndex, setCommandHistoryInvertedIndex] =
+    useState<number>(0);
 
   const textareaRef = createRef<HTMLTextAreaElement>();
 
@@ -29,8 +32,24 @@ const Terminal: FC<Props> = (props) => {
     [textareaRef, textareaRows]
   );
 
-  const addHistory = (line: string) => {
-    setHistory(history + line);
+  const addHistory = (command: string, res: string) => {
+    const fixedCommand = command
+      .split("\n")
+      .join(`\n${" ".repeat(commandLinePrefix.length)}`);
+    const line = `${commandLinePrefix}${fixedCommand}\n${res}\n`;
+
+    setCommandHistory(commandHistory.concat(command));
+    setMergedHistory(mergedHistory + line);
+  };
+
+  const loadHistory = (newIndex: number) => {
+    if (newIndex >= 1 && newIndex <= commandHistory.length) {
+      setCommandHistoryInvertedIndex(newIndex);
+      setTextareaContent(commandHistory[commandHistory.length - newIndex]);
+    } else if (newIndex <= 0) {
+      setCommandHistoryInvertedIndex(newIndex);
+      setTextareaContent("");
+    }
   };
 
   const handleChange: ChangeEventHandler<HTMLTextAreaElement> = (e) => {
@@ -46,16 +65,19 @@ const Terminal: FC<Props> = (props) => {
           e.preventDefault();
 
           const res = await props.command(textareaContent);
-          const history = textareaContent
-            .split("\n")
-            .join(`\n${" ".repeat(commandLinePrefix.length)}`);
-          addHistory(`${commandLinePrefix}${history}\n${res}\n`);
+          addHistory(textareaContent, res);
 
           setTextareaContent("");
           setTextareaRows(1);
         } else {
           setTextareaRows(textareaRows + 1);
         }
+        break;
+      case "ArrowUp":
+        loadHistory(commandHistoryInvertedIndex + 1);
+        break;
+      case "ArrowDown":
+        loadHistory(commandHistoryInvertedIndex - 1);
         break;
       default:
         break;
@@ -65,14 +87,14 @@ const Terminal: FC<Props> = (props) => {
   return (
     <>
       <div className="flex flex-col w-full h-full overflow-x-hidden overflow-y-scroll bg-black text-green-500 font-mono text-base">
-        <pre>{history}</pre>
+        <pre>{mergedHistory}</pre>
         <div className="flex w-full">
           <pre className="flex-initial">{commandLinePrefix}</pre>
           <textarea
             className="flex-auto outline-none bg-black text-green-500 font-mono text-base"
             rows={textareaRows}
             onChange={handleChange}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyPress}
             value={textareaContent}
             ref={textareaRef}
           />
