@@ -57,12 +57,12 @@ const Terminal: FC<Props> = (props) => {
 
   return (
     <>
-      <div className="flex flex-col w-full h-full bg-black text-green-500">
+      <div className="flex flex-col w-full h-full bg-black text-green-500 font-mono text-base">
         <pre>{history}</pre>
         <div className="flex w-full">
           <pre className="flex-initial">{"> "}</pre>
           <textarea
-            className="flex-auto outline-none bg-black text-green-500"
+            className="flex-auto outline-none bg-black text-green-500 font-mono text-base"
             rows={textareaRows}
             onChange={handleChange}
             onKeyPress={handleKeyPress}
