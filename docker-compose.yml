@@ -18,7 +18,7 @@ services:
       context: frontend
       target: development
     environment:
-      API_HOST_URI: ${}
+      API_HOST_URI: ${POSTGRES_PLAYGROUND_API_HOST_URI}
     volumes:
       - ./frontend:/app
       - node_modules:/app/node_modules
