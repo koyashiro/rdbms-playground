@@ -1,5 +1,4 @@
 import "tailwindcss/tailwind.css";
-import "../styles/button.css";
 
 import type { AppProps } from "next/app";
 
