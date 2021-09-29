@@ -82,7 +82,7 @@ func (dr RDBMSRepositoryImpl) Execute(c *types.ContainerJSON, query string) (*mo
 
 	columns := make([]*model.Column, len(types), len(types))
 	for i := range columns {
-		columns[i] = model.NewExportColumn(types[i])
+		columns[i] = model.NewColumn(types[i])
 	}
 
 	return &model.ExecuteResult{Columns: columns, Rows: values}, nil

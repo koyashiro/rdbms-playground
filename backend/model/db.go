@@ -18,7 +18,7 @@ type Column struct {
 	Scale        *int64 `json:"scale,omitempty"`
 }
 
-func NewExportColumn(ct *sql.ColumnType) *Column {
+func NewColumn(ct *sql.ColumnType) *Column {
 	var nullable *bool
 	if n, ok := ct.Nullable(); ok {
 		nullable = &n
