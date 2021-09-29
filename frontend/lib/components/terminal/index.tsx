@@ -12,7 +12,7 @@ type Props = {
 };
 
 const defaultHistory = `
-Welcome to Postgres Playground!
+Welcome to RDBMS Playground!
 `;
 
 const commandLinePrefix = "> ";

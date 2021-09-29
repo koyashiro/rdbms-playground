@@ -1,4 +1,4 @@
-module github.com/koyashiro/postgres-playground/backend
+module github.com/koyashiro/rdbms-playground/backend
 
 go 1.16
 

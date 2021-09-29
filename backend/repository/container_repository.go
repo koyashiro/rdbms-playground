@@ -11,7 +11,7 @@ import (
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
 
-	"github.com/koyashiro/postgres-playground/backend/env"
+	"github.com/koyashiro/rdbms-playground/backend/env"
 )
 
 type ContainerRepository interface {

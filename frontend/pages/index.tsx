@@ -33,13 +33,13 @@ const Home: NextPage = () => {
   return (
     <div className="flex flex-col items-center justify-center h-screen min-h-screen pt-0 pb-2">
       <Head>
-        <title>Postgres Playground</title>
-        <meta name="description" content="PostgreSQL Playground" />
+        <title>RDBMS Playground</title>
+        <meta name="description" content="RDBMS Playground" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className="flex flex-col items-center justify-center">
-        <h1 className="m-2 text-6xl text-center">Postgres Playground</h1>
+        <h1 className="m-2 text-6xl text-center">RDBMS Playground</h1>
 
         <p className="m-2 text-2xl text-center">
           Get started by Creating Workspace

@@ -3,8 +3,8 @@ package service
 import (
 	"github.com/google/uuid"
 
-	"github.com/koyashiro/postgres-playground/backend/model"
-	"github.com/koyashiro/postgres-playground/backend/repository"
+	"github.com/koyashiro/rdbms-playground/backend/model"
+	"github.com/koyashiro/rdbms-playground/backend/repository"
 )
 
 type WorkspaceService interface {

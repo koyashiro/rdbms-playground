@@ -4,9 +4,9 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	"github.com/koyashiro/postgres-playground/backend/handler"
-	"github.com/koyashiro/postgres-playground/backend/repository"
-	"github.com/koyashiro/postgres-playground/backend/service"
+	"github.com/koyashiro/rdbms-playground/backend/handler"
+	"github.com/koyashiro/rdbms-playground/backend/repository"
+	"github.com/koyashiro/rdbms-playground/backend/service"
 )
 
 const port = "1323"

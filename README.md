@@ -1,4 +1,4 @@
-# postgres-playground
+# rdbms-playground
 
 1. Create `.env`
 

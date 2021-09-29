@@ -9,7 +9,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 
-	"github.com/koyashiro/postgres-playground/backend/model"
+	"github.com/koyashiro/rdbms-playground/backend/model"
 )
 
 func dataSourceName(driverName string, host string) (string, error) {

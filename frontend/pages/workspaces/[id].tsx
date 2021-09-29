@@ -9,14 +9,15 @@ const Workspace: NextPage = () => {
   const router = useRouter();
   const { id } = router.query;
   if (typeof id !== "string") {
+    console.error(`id is not string, ${typeof id}`);
     throw new Error("id is not string");
   }
 
   return (
     <div className="flex flex-col items-center justify-center h-screen min-h-screen pt-0 pb-2">
       <Head>
-        <title>Postgres Playground</title>
-        <meta name="description" content="PostgreSQL Playground" />
+        <title>RDBMS Playground</title>
+        <meta name="description" content="RDBMS Playground" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 

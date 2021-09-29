@@ -1,5 +1,5 @@
 FROM golang:latest as development
-WORKDIR /go/src/github.com/koyashiro/postgres-playground
+WORKDIR /go/src/github.com/koyashiro/rdbms-playground
 COPY go.mod go.sum ./
 RUN go mod download
 RUN go get -u github.com/cosmtrek/air
@@ -7,13 +7,13 @@ COPY . .
 CMD ["air"]
 
 FROM golang:latest as build
-WORKDIR /go/src/github.com/koyashiro/postgres-playground
+WORKDIR /go/src/github.com/koyashiro/rdbms-playground
 COPY . .
 COPY --from=development /go/pkg /go/pkg
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o app .
 
 FROM gcr.io/distroless/static:latest as production
 WORKDIR /root
-COPY --from=build /go/src/github.com/koyashiro/postgres-playground/app /usr/bin/app
+COPY --from=build /go/src/github.com/koyashiro/rdbms-playground/app /usr/bin/app
 EXPOSE 80
 CMD ["/usr/bin/app"]
