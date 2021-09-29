@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/docker/docker/api/types"
 	_ "github.com/go-sql-driver/mysql"
@@ -52,38 +53,46 @@ func (dr RDBMSRepositoryImpl) Execute(c *types.ContainerJSON, query string) (*mo
 	}
 	defer db.Close()
 
-	rows, err := db.Query(query)
+	rs, err := db.Query(query)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer rs.Close()
 
-	types, err := rows.ColumnTypes()
+	columnTypes, err := rs.ColumnTypes()
 	if err != nil {
 		return nil, err
 	}
 
-	values := make([][]interface{}, 0)
+	columns := make([]model.Column, len(columnTypes), len(columnTypes))
+	for i := range columns {
+		columns[i] = *model.NewColumn(columnTypes[i])
+	}
 
-	ptrs := make([]interface{}, len(types))
+	rows := make([][]interface{}, 0)
 
-	for rows.Next() {
-		row := make([]interface{}, len(types))
+	for rs.Next() {
+		row := make([]interface{}, len(columns))
+		rowPtrs := make([]interface{}, len(columns))
 		for i := range row {
-			ptrs[i] = &row[i]
+			rowPtrs[i] = &row[i]
 		}
 
-		if err = rows.Scan(ptrs...); err != nil {
+		if err = rs.Scan(rowPtrs...); err != nil {
 			return nil, err
 		}
 
-		values = append(values, row)
+		for i := range row {
+			switch r := row[i].(type) {
+			case []byte:
+				row[i] = string(r)
+			case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, bool, float32, float64:
+				row[i] = fmt.Sprint(r)
+			}
+		}
+
+		rows = append(rows, row)
 	}
 
-	columns := make([]*model.Column, len(types), len(types))
-	for i := range columns {
-		columns[i] = model.NewColumn(types[i])
-	}
-
-	return &model.ExecuteResult{Columns: columns, Rows: values}, nil
+	return &model.ExecuteResult{Columns: columns, Rows: rows}, nil
 }

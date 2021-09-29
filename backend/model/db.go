@@ -5,7 +5,7 @@ import (
 )
 
 type ExecuteResult struct {
-	Columns []*Column       `json:"columns"`
+	Columns []Column        `json:"columns"`
 	Rows    [][]interface{} `json:"rows"`
 }
 
