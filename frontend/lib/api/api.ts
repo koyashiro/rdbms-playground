@@ -4,17 +4,15 @@ export type ErrorResponse = {
   error: string;
 };
 
-export type Playground = {
+export type Workspace = {
   id: string;
-  db: string;
-  version: string;
   container: Container;
 };
 
 export type Container = {
   id: string;
+  name: string;
   image: string;
-  status: string;
 };
 
 export type Empty = Record<string, never>;
@@ -24,11 +22,11 @@ type Query = {
 };
 
 export type ExecuteResult = {
-  columns: ExportColumn[];
+  columns: Column[];
   rows: string[][];
 };
 
-export type ExportColumn = {
+export type Column = {
   name: string;
   databaseType: string;
   nullable?: boolean;
@@ -37,52 +35,52 @@ export type ExportColumn = {
   scale?: number;
 };
 
-export const getAllPlaygrounds = async (): Promise<
-  Playground[] | ErrorResponse
+export const getAllWorkspaces = async (): Promise<
+  Workspace[] | ErrorResponse
 > => {
-  const res = await fetchApi("GET", "/playgrounds", {});
+  const res = await fetchApi("GET", "/workspaces", {});
   const json = await res.json();
 
   if (!res.ok) return json as ErrorResponse;
-  return json as Playground[];
+  return json as Workspace[];
 };
 
-export const getPlaygroundById = async (
+export const getWorkspaceById = async (
   id: number
-): Promise<Playground | ErrorResponse> => {
-  const res = await fetchApi("GET", `/playgrounds/${id}`, {});
+): Promise<Workspace | ErrorResponse> => {
+  const res = await fetchApi("GET", `/workspaces/${id}`, {});
   const json = await res.json();
 
   if (!res.ok) return json as ErrorResponse;
-  return json as Playground;
+  return json as Workspace;
 };
 
-export const postPlayground = async (): Promise<Playground | ErrorResponse> => {
+export const postWorkspace = async (): Promise<Workspace | ErrorResponse> => {
   // TODO: db selection
-  const res = await fetchApi("POST", `/playgrounds`, {
+  const res = await fetchApi("POST", `/workspaces`, {
     body: { db: "postgres" },
   });
   const json = await res.json();
 
   if (!res.ok) return json as ErrorResponse;
-  return json as Playground;
+  return json as Workspace;
 };
 
-export const deletePlayground = async (
+export const deleteWorkspace = async (
   id: number
 ): Promise<Empty | ErrorResponse> => {
-  const res = await fetchApi("DELETE", `/playgrounds/${id}`, {});
+  const res = await fetchApi("DELETE", `/workspaces/${id}`, {});
   const json = await res.json();
 
   if (!res.ok) return json as ErrorResponse;
   return {};
 };
 
-export const postPlaygroundQuery = async (
+export const postWorkspaceQuery = async (
   id: string,
   body: Query
 ): Promise<ExecuteResult | ErrorResponse> => {
-  const res = await fetchApi("POST", `/playgrounds/${id}/query`, { body });
+  const res = await fetchApi("POST", `/workspaces/${id}/query`, { body });
   const json = await res.json();
 
   if (!res.ok) return json as ErrorResponse;

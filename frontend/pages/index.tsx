@@ -19,7 +19,7 @@ const Home: NextPage = () => {
   const [state, setState] = useState<State>({ state: "NORMAL" });
 
   const onClick = async (): Promise<void> => {
-    const res = await Api.postPlayground().catch(() => ({
+    const res = await Api.postWorkspace().catch(() => ({
       error: "API request failure",
     }));
     if ("error" in res) {
@@ -27,7 +27,7 @@ const Home: NextPage = () => {
       return;
     }
 
-    router.push(`/playground/${res.id}`);
+    router.push(`/workspaces/${res.id}`);
   };
 
   return (

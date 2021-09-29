@@ -5,7 +5,7 @@ import Head from "next/head";
 import * as Api from "../../lib/api/api";
 import Terminal from "../../lib/components/terminal";
 
-const Playground: NextPage = () => {
+const Workspace: NextPage = () => {
   const router = useRouter();
   const { id } = router.query;
   if (typeof id !== "string") {
@@ -23,7 +23,7 @@ const Playground: NextPage = () => {
       <main className="flex flex-col items-center justify-center w-screen h-screen">
         <Terminal
           command={async (cmd: string) => {
-            const res = await Api.postPlaygroundQuery(id, {
+            const res = await Api.postWorkspaceQuery(id, {
               query: cmd,
             }).catch(() => ({
               error: "API request failure",
@@ -36,4 +36,4 @@ const Playground: NextPage = () => {
   );
 };
 
-export default Playground;
+export default Workspace;

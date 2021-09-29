@@ -1,6 +1,6 @@
 package model
 
-type Playground struct {
+type Workspace struct {
 	ID        string     `json:"id"`
 	Container *Container `json:"container"`
 }

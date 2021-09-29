@@ -55,11 +55,11 @@ func (r *ContainerRepositoryImpl) Get(id string) (*types.ContainerJSON, error) {
 	return r.get(id)
 }
 
-func (r *ContainerRepositoryImpl) Create(playgroundID string, db string) (*types.ContainerJSON, error) {
+func (r *ContainerRepositoryImpl) Create(workspaceID string, db string) (*types.ContainerJSON, error) {
 	r.Lock()
 	defer r.Unlock()
 
-	ccb, err := r.create(playgroundID, db)
+	ccb, err := r.create(workspaceID, db)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +122,7 @@ var restrictHostConfig = &container.HostConfig{
 	CapDrop: []string{"fsetid", "kill", "setpcap", "net_raw", "sys_chroot", "mknod", "audit_write", "setfcap"},
 }
 
-func config(playgroundID string, db string) (*container.Config, error) {
+func config(workspaceID string, db string) (*container.Config, error) {
 	const password = "password"
 	switch db {
 	case "mysql":
@@ -130,7 +130,7 @@ func config(playgroundID string, db string) (*container.Config, error) {
 			Image: "mysql",
 			Labels: map[string]string{
 				"type": "playground",
-				"pgid": playgroundID,
+				"wid":  workspaceID,
 			},
 			Env: []string{"MYSQL_ROOT_PASSWORD=" + password},
 		}, nil
@@ -139,7 +139,7 @@ func config(playgroundID string, db string) (*container.Config, error) {
 			Image: "postgres",
 			Labels: map[string]string{
 				"type": "playground",
-				"pgid": playgroundID,
+				"wid":  workspaceID,
 			},
 			Env: []string{"POSTGRES_PASSWORD=" + password},
 		}, nil
@@ -148,13 +148,13 @@ func config(playgroundID string, db string) (*container.Config, error) {
 	}
 }
 
-func (r *ContainerRepositoryImpl) create(playgroundID string, db string) (container.ContainerCreateCreatedBody, error) {
-	c, err := config(playgroundID, db)
+func (r *ContainerRepositoryImpl) create(workspaceID string, db string) (container.ContainerCreateCreatedBody, error) {
+	c, err := config(workspaceID, db)
 	if err != nil {
 		return container.ContainerCreateCreatedBody{}, err
 	}
 
-	return r.client.ContainerCreate(r.ctx, c, restrictHostConfig, nil, nil, playgroundID)
+	return r.client.ContainerCreate(r.ctx, c, restrictHostConfig, nil, nil, workspaceID)
 }
 
 func (r *ContainerRepositoryImpl) start(id string) error {

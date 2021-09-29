@@ -12,24 +12,24 @@ type ErrorResponse struct {
 	Error string `json:"error"`
 }
 
-type PlaygroundsHandler interface {
-	GetPlaygrounds(c echo.Context) error
-	GetPlayground(c echo.Context) error
-	PostPlayground(c echo.Context) error
-	DeletePlayground(c echo.Context) error
+type WorkspacesHandler interface {
+	GetWorkspaces(c echo.Context) error
+	GetWorkspace(c echo.Context) error
+	PostWorkspace(c echo.Context) error
+	DeleteWorkspace(c echo.Context) error
 	ExecuteQuery(c echo.Context) error
 }
 
-type PlaygroundsHandlerImpl struct {
-	playgroundService service.PlaygroundService
+type WorkspacesHandlerImpl struct {
+	workspaceService service.WorkspaceService
 }
 
-func NewPlaygroundsHandler(service service.PlaygroundService) PlaygroundsHandler {
-	return &PlaygroundsHandlerImpl{playgroundService: service}
+func NewWorkspacesHandler(service service.WorkspaceService) WorkspacesHandler {
+	return &WorkspacesHandlerImpl{workspaceService: service}
 }
 
-func (h *PlaygroundsHandlerImpl) GetPlaygrounds(c echo.Context) error {
-	ps, err := h.playgroundService.GetAll()
+func (h *WorkspacesHandlerImpl) GetWorkspaces(c echo.Context) error {
+	ps, err := h.workspaceService.GetAll()
 	if err != nil {
 		c.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}
@@ -39,9 +39,9 @@ func (h *PlaygroundsHandlerImpl) GetPlaygrounds(c echo.Context) error {
 	return c.JSON(http.StatusOK, ps)
 }
 
-func (h *PlaygroundsHandlerImpl) GetPlayground(c echo.Context) error {
+func (h *WorkspacesHandlerImpl) GetWorkspace(c echo.Context) error {
 	id := c.Param("id")
-	p, err := h.playgroundService.Get(id)
+	p, err := h.workspaceService.Get(id)
 	if err != nil {
 		c.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}
@@ -51,7 +51,7 @@ func (h *PlaygroundsHandlerImpl) GetPlayground(c echo.Context) error {
 	return c.JSON(http.StatusOK, p)
 }
 
-func (h *PlaygroundsHandlerImpl) PostPlayground(c echo.Context) error {
+func (h *WorkspacesHandlerImpl) PostWorkspace(c echo.Context) error {
 	type Create struct {
 		Db string `json:"db"`
 	}
@@ -63,7 +63,7 @@ func (h *PlaygroundsHandlerImpl) PostPlayground(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, res)
 	}
 
-	p, err := h.playgroundService.Create(create.Db)
+	p, err := h.workspaceService.Create(create.Db)
 	if err != nil {
 		c.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}
@@ -73,9 +73,9 @@ func (h *PlaygroundsHandlerImpl) PostPlayground(c echo.Context) error {
 	return c.JSON(http.StatusOK, p)
 }
 
-func (h *PlaygroundsHandlerImpl) DeletePlayground(c echo.Context) error {
+func (h *WorkspacesHandlerImpl) DeleteWorkspace(c echo.Context) error {
 	id := c.Param("id")
-	if err := h.playgroundService.Destroy(id); err != nil {
+	if err := h.workspaceService.Destroy(id); err != nil {
 		c.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}
 		return c.JSON(http.StatusInternalServerError, res)
@@ -84,7 +84,7 @@ func (h *PlaygroundsHandlerImpl) DeletePlayground(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-func (h *PlaygroundsHandlerImpl) ExecuteQuery(c echo.Context) error {
+func (h *WorkspacesHandlerImpl) ExecuteQuery(c echo.Context) error {
 	id := c.Param("id")
 
 	type Query struct {
@@ -98,7 +98,7 @@ func (h *PlaygroundsHandlerImpl) ExecuteQuery(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, res)
 	}
 
-	r, err := h.playgroundService.Execute(id, q.Query)
+	r, err := h.workspaceService.Execute(id, q.Query)
 	if err != nil {
 		c.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}

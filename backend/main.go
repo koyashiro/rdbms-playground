@@ -26,15 +26,15 @@ func main() {
 		panic(err)
 	}
 	rr := repository.NewRDBMSRepository()
-	ps := service.NewPlaygroundService(cr, rr)
-	ph := handler.NewPlaygroundsHandler(ps)
+	ps := service.NewWorkspaceService(cr, rr)
+	ph := handler.NewWorkspacesHandler(ps)
 
 	// Routes
-	e.GET("/playgrounds", ph.GetPlaygrounds)
-	e.GET("/playgrounds/:id", ph.GetPlayground)
-	e.POST("/playgrounds", ph.PostPlayground)
-	e.DELETE("/playgrounds/:id", ph.DeletePlayground)
-	e.POST("/playgrounds/:id/query", ph.ExecuteQuery)
+	e.GET("/workspaces", ph.GetWorkspaces)
+	e.GET("/workspaces/:id", ph.GetWorkspace)
+	e.POST("/workspaces", ph.PostWorkspace)
+	e.DELETE("/workspaces/:id", ph.DeleteWorkspace)
+	e.POST("/workspaces/:id/query", ph.ExecuteQuery)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":" + port))
