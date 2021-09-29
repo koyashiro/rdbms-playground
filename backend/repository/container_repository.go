@@ -117,13 +117,17 @@ func (r *ContainerRepositoryImpl) get(id string) (*model.Container, error) {
 	}, nil
 }
 
+var restrictHostConfig = &container.HostConfig{
+	CapDrop: []string{"fsetid", "kill", "setpcap", "net_raw", "sys_chroot", "mknod", "audit_write", "setfcap"},
+}
+
 func (r *ContainerRepositoryImpl) create(name string, db string) (container.ContainerCreateCreatedBody, error) {
 	c, ok := configs[db]
 	if !ok {
 		return container.ContainerCreateCreatedBody{}, errors.New("invalid db")
 	}
 
-	return r.client.ContainerCreate(r.ctx, c, nil, nil, nil, name)
+	return r.client.ContainerCreate(r.ctx, c, restrictHostConfig, nil, nil, name)
 }
 
 func (r *ContainerRepositoryImpl) start(id string) error {
