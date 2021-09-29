@@ -8,6 +8,9 @@ import Terminal from "../../lib/components/terminal";
 const Playground: NextPage = () => {
   const router = useRouter();
   const { id } = router.query;
+  if (typeof id !== "string") {
+    throw new Error("id is not string");
+  }
 
   return (
     <div className="flex flex-col items-center justify-center h-screen min-h-screen pt-0 pb-2">
