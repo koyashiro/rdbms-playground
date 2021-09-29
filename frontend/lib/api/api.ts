@@ -58,7 +58,10 @@ export const getPlaygroundById = async (
 };
 
 export const postPlayground = async (): Promise<Playground | ErrorResponse> => {
-  const res = await fetchApi("POST", `/playgrounds`, {});
+  // TODO: db selection
+  const res = await fetchApi("POST", `/playgrounds`, {
+    body: { db: "postgres" },
+  });
   const json = await res.json();
 
   if (!res.ok) return json as ErrorResponse;
