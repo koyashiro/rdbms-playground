@@ -27,9 +27,6 @@ services:
     stdin_open: true
     tty: true
 
-  redis:
-    image: redis:latest
-
 networks:
   default:
     name: ${PLAYGROUND_NETWORK:-playground-network}

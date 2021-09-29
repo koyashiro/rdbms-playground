@@ -8,30 +8,16 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
 
 	"github.com/koyashiro/postgres-playground/backend/env"
-	"github.com/koyashiro/postgres-playground/backend/model"
 )
 
-const password = "password"
-
-var configs = map[string]*container.Config{
-	"mysql": {
-		Image:  "mysql",
-		Labels: map[string]string{"type": "playground"},
-		Env:    []string{"MYSQL_ROOT_PASSWORD=" + password},
-	},
-	"postgres": {
-		Image:  "postgres",
-		Labels: map[string]string{"type": "playground"},
-		Env:    []string{"POSTGRES_PASSWORD=" + password},
-	},
-}
-
 type ContainerRepository interface {
-	Get(id string) (*model.Container, error)
-	Create(name string, db string) (*model.Container, error)
+	GetAll() ([]types.Container, error)
+	Get(id string) (*types.ContainerJSON, error)
+	Create(name string, db string) (*types.ContainerJSON, error)
 	Delete(id string) error
 }
 
@@ -55,18 +41,25 @@ func NewContainerRepository() (ContainerRepository, error) {
 	return &ContainerRepositoryImpl{ctx: ctx, client: c}, nil
 }
 
-func (r *ContainerRepositoryImpl) Get(id string) (*model.Container, error) {
+func (r *ContainerRepositoryImpl) GetAll() ([]types.Container, error) {
+	r.Lock()
+	defer r.Unlock()
+
+	return r.getAll()
+}
+
+func (r *ContainerRepositoryImpl) Get(id string) (*types.ContainerJSON, error) {
 	r.Lock()
 	defer r.Unlock()
 
 	return r.get(id)
 }
 
-func (r *ContainerRepositoryImpl) Create(name string, db string) (*model.Container, error) {
+func (r *ContainerRepositoryImpl) Create(playgroundID string, db string) (*types.ContainerJSON, error) {
 	r.Lock()
 	defer r.Unlock()
 
-	ccb, err := r.create(name, db)
+	ccb, err := r.create(playgroundID, db)
 	if err != nil {
 		return nil, err
 	}
@@ -104,30 +97,64 @@ func (r *ContainerRepositoryImpl) Delete(id string) error {
 	})
 }
 
-func (r *ContainerRepositoryImpl) get(id string) (*model.Container, error) {
+func (r *ContainerRepositoryImpl) getAll() ([]types.Container, error) {
+	clo := types.ContainerListOptions{
+		Filters: filters.NewArgs(filters.Arg("label", "type=playground")),
+	}
+	cl, err := r.client.ContainerList(r.ctx, clo)
+	if err != nil {
+		return nil, err
+	}
+
+	return cl, nil
+}
+
+func (r *ContainerRepositoryImpl) get(id string) (*types.ContainerJSON, error) {
 	c, err := r.client.ContainerInspect(r.ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	return &model.Container{
-		ID:     id,
-		Image:  c.Image,
-		Status: c.State.Status,
-	}, nil
+	return &c, nil
 }
 
 var restrictHostConfig = &container.HostConfig{
 	CapDrop: []string{"fsetid", "kill", "setpcap", "net_raw", "sys_chroot", "mknod", "audit_write", "setfcap"},
 }
 
-func (r *ContainerRepositoryImpl) create(name string, db string) (container.ContainerCreateCreatedBody, error) {
-	c, ok := configs[db]
-	if !ok {
-		return container.ContainerCreateCreatedBody{}, errors.New("invalid db")
+func config(playgroundID string, db string) (*container.Config, error) {
+	const password = "password"
+	switch db {
+	case "mysql":
+		return &container.Config{
+			Image: "mysql",
+			Labels: map[string]string{
+				"type": "playground",
+				"pgid": playgroundID,
+			},
+			Env: []string{"MYSQL_ROOT_PASSWORD=" + password},
+		}, nil
+	case "postgres":
+		return &container.Config{
+			Image: "postgres",
+			Labels: map[string]string{
+				"type": "playground",
+				"pgid": playgroundID,
+			},
+			Env: []string{"POSTGRES_PASSWORD=" + password},
+		}, nil
+	default:
+		return nil, errors.New("invalid db")
+	}
+}
+
+func (r *ContainerRepositoryImpl) create(playgroundID string, db string) (container.ContainerCreateCreatedBody, error) {
+	c, err := config(playgroundID, db)
+	if err != nil {
+		return container.ContainerCreateCreatedBody{}, err
 	}
 
-	return r.client.ContainerCreate(r.ctx, c, restrictHostConfig, nil, nil, name)
+	return r.client.ContainerCreate(r.ctx, c, restrictHostConfig, nil, nil, playgroundID)
 }
 
 func (r *ContainerRepositoryImpl) start(id string) error {
