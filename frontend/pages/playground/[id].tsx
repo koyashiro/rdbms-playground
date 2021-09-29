@@ -8,20 +8,19 @@ import Terminal from "../../lib/components/terminal";
 const Playground: NextPage = () => {
   const router = useRouter();
   const { id } = router.query;
-  const idNumber = Number(id);
 
   return (
-    <div className="min-h-screen pt-0 pb-2 flex flex-col justify-center items-center h-screen">
+    <div className="flex flex-col items-center justify-center h-screen min-h-screen pt-0 pb-2">
       <Head>
         <title>Postgres Playground</title>
         <meta name="description" content="PostgreSQL Playground" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex flex-col justify-center items-center h-screen w-screen">
+      <main className="flex flex-col items-center justify-center w-screen h-screen">
         <Terminal
           command={async (cmd: string) => {
-            const res = await Api.postPlaygroundQuery(idNumber, {
+            const res = await Api.postPlaygroundQuery(id, {
               query: cmd,
             }).catch(() => ({
               error: "API request failure",

@@ -79,7 +79,7 @@ export const deletePlayground = async (
 };
 
 export const postPlaygroundQuery = async (
-  id: number,
+  id: string,
   body: Query
 ): Promise<ExecuteResult | ErrorResponse> => {
   const res = await fetchApi("POST", `/playgrounds/${id}/query`, { body });
