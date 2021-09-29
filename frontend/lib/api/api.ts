@@ -55,10 +55,12 @@ export const getWorkspaceById = async (
   return json as Workspace;
 };
 
-export const postWorkspace = async (): Promise<Workspace | ErrorResponse> => {
+export const postWorkspace = async (
+  db: "mysql" | "postgres"
+): Promise<Workspace | ErrorResponse> => {
   // TODO: db selection
   const res = await fetchApi("POST", `/workspaces`, {
-    body: { db: "postgres" },
+    body: { db },
   });
   const json = await res.json();
 

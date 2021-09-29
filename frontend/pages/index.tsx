@@ -18,8 +18,8 @@ const Home: NextPage = () => {
   const router = useRouter();
   const [state, setState] = useState<State>({ state: "NORMAL" });
 
-  const onClick = async (): Promise<void> => {
-    const res = await Api.postWorkspace().catch(() => ({
+  const onClick = async (db: "mysql" | "postgres"): Promise<void> => {
+    const res = await Api.postWorkspace(db).catch(() => ({
       error: "API request failure",
     }));
     if ("error" in res) {
@@ -31,14 +31,14 @@ const Home: NextPage = () => {
   };
 
   return (
-    <div className="min-h-screen pt-0 pb-2 flex flex-col justify-center items-center h-screen">
+    <div className="flex flex-col items-center justify-center h-screen min-h-screen pt-0 pb-2">
       <Head>
         <title>Postgres Playground</title>
         <meta name="description" content="PostgreSQL Playground" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex flex-col justify-center items-center">
+      <main className="flex flex-col items-center justify-center">
         <h1 className="m-2 text-6xl text-center">Postgres Playground</h1>
 
         <p className="m-2 text-2xl text-center">
@@ -47,21 +47,30 @@ const Home: NextPage = () => {
 
         {state.state === "ERROR" && (
           <div role="alert" className="m-2">
-            <div className="bg-red-500 text-white font-bold rounded-t px-4 py-2">
+            <div className="px-4 py-2 font-bold text-white bg-red-500 rounded-t">
               Error
             </div>
-            <div className="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700">
+            <div className="px-4 py-3 text-red-700 bg-red-100 border border-t-0 border-red-400 rounded-b">
               <p>{state.error}</p>
             </div>
           </div>
         )}
 
-        <button
-          className="m-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={onClick}
-        >
-          Create Workspace
-        </button>
+        <div>
+          <button
+            className="px-4 py-2 m-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700"
+            onClick={() => onClick("mysql")}
+          >
+            Create MySQL Workspace
+          </button>
+
+          <button
+            className="px-4 py-2 m-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700"
+            onClick={() => onClick("postgres")}
+          >
+            Create PostgreSQL Workspace
+          </button>
+        </div>
       </main>
     </div>
   );

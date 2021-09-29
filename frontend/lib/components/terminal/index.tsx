@@ -86,7 +86,7 @@ const Terminal: FC<Props> = (props) => {
 
   return (
     <>
-      <div className="flex flex-col w-full h-full overflow-x-hidden overflow-y-scroll bg-black text-green-500 font-mono text-base">
+      <div className="flex flex-col w-full h-full overflow-x-hidden overflow-y-scroll font-mono text-base text-green-500 bg-black">
         <pre>{mergedHistory}</pre>
         <div className="flex w-full">
           <pre className="flex-initial">{commandLinePrefix}</pre>
