@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
+	"github.com/docker/docker/api/types"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 
@@ -22,7 +23,7 @@ func dataSourceName(driverName string, host string) (string, error) {
 }
 
 type DBRepository interface {
-	Execute(playground *model.Playground, query string) (*model.ExecuteResult, error)
+	Execute(c *types.ContainerJSON, query string) (*model.ExecuteResult, error)
 }
 
 type DBRepositoryImpl struct{}
@@ -31,9 +32,16 @@ func NewDBRepository() DBRepository {
 	return &DBRepositoryImpl{}
 }
 
-func (dr DBRepositoryImpl) Execute(playground *model.Playground, query string) (*model.ExecuteResult, error) {
-	driverName := playground.DB
-	dataSourceName, err := dataSourceName(driverName, playground.ID)
+func (dr DBRepositoryImpl) Execute(c *types.ContainerJSON, query string) (*model.ExecuteResult, error) {
+	driverName := c.Config.Image
+	var host string
+	if c.Name[0] == '/' {
+		host = c.Name[1:]
+	} else {
+		host = c.Name
+	}
+
+	dataSourceName, err := dataSourceName(driverName, host)
 	if err != nil {
 		return nil, err
 	}

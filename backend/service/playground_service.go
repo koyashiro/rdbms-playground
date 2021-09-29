@@ -16,73 +16,79 @@ type PlaygroundService interface {
 }
 
 type PlaygroundServiceImpl struct {
-	pr  repository.PlaygroundRepository
 	cr  repository.ContainerRepository
 	dbr repository.DBRepository
 }
 
 func NewPlaygroundService(
-	pr repository.PlaygroundRepository,
 	cr repository.ContainerRepository,
 	dbr repository.DBRepository,
 ) PlaygroundService {
 	return &PlaygroundServiceImpl{
-		pr:  pr,
 		cr:  cr,
 		dbr: dbr,
 	}
 }
 
 func (s *PlaygroundServiceImpl) GetAll() ([]*model.Playground, error) {
-	return s.pr.GetAll()
+	containers, err := s.cr.GetAll()
+	if err != nil {
+		return nil, err
+	}
+
+	playgrounds := make([]*model.Playground, len(containers), len(containers))
+	for i, container := range containers {
+		c := model.NewContainerFromContainer(&container)
+		playgrounds[i] = &model.Playground{
+			ID:        c.Name,
+			Container: c,
+		}
+	}
+
+	return playgrounds, nil
 }
 
 func (s *PlaygroundServiceImpl) Get(id string) (*model.Playground, error) {
-	return s.pr.Get(id)
+	cj, err := s.cr.Get(id)
+	if err != nil {
+		return nil, err
+	}
+
+	c := model.NewContainerFromContainerJSON(cj)
+	return &model.Playground{
+		ID:        c.Name,
+		Container: model.NewContainerFromContainerJSON(cj),
+	}, nil
 }
 
 func (s *PlaygroundServiceImpl) Create(db string) (*model.Playground, error) {
 	id := uuid.New().String()
 
-	c, err := s.cr.Create(id, db)
+	cj, err := s.cr.Create(id, db)
 	if err != nil {
 		return nil, err
 	}
 
+	c := model.NewContainerFromContainerJSON(cj)
 	p := &model.Playground{
-		ID:        id,
-		DB:        db,
-		Version:   "latest",
+		ID:        c.Name,
 		Container: c,
-	}
-
-	if err := s.pr.Set(p); err != nil {
-		return nil, err
 	}
 
 	return p, nil
 }
 
 func (s *PlaygroundServiceImpl) Destroy(id string) error {
-	p, err := s.pr.Get(id)
-	if err != nil {
-		return err
-	}
-
-	if err := s.cr.Delete(p.Container.ID); err != nil {
-		return err
-	}
-
-	return s.pr.Delete(id)
+	return s.cr.Delete(id)
 }
 
 func (s *PlaygroundServiceImpl) Execute(id string, query string) (*model.ExecuteResult, error) {
-	p, err := s.Get(id)
+	cj, err := s.cr.Get(id)
 	if err != nil {
 		return nil, err
 	}
 
-	r, err := s.dbr.Execute(p, query)
+	r, err := s.dbr.Execute(cj, query)
 	if err != nil {
 		return nil, err
 	}

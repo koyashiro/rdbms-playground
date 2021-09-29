@@ -21,13 +21,12 @@ func main() {
 	e.Use(middleware.CORS())
 
 	// TODO: replace DI
-	pr := repository.NewPlaygroundRepository()
 	cr, err := repository.NewContainerRepository()
 	if err != nil {
 		panic(err)
 	}
 	dbr := repository.NewDBRepository()
-	ps := service.NewPlaygroundService(pr, cr, dbr)
+	ps := service.NewPlaygroundService(cr, dbr)
 	ph := handler.NewPlaygroundsHandler(ps)
 
 	// Routes
