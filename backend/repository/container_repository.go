@@ -118,6 +118,10 @@ func (r *ContainerRepositoryImpl) get(id string) (*types.ContainerJSON, error) {
 	return &c, nil
 }
 
+var restrictHostConfig = &container.HostConfig{
+	CapDrop: []string{"fsetid", "kill", "setpcap", "net_raw", "sys_chroot", "mknod", "audit_write", "setfcap"},
+}
+
 func config(playgroundID string, db string) (*container.Config, error) {
 	const password = "password"
 	switch db {
@@ -150,7 +154,7 @@ func (r *ContainerRepositoryImpl) create(playgroundID string, db string) (contai
 		return container.ContainerCreateCreatedBody{}, err
 	}
 
-	return r.client.ContainerCreate(r.ctx, c, nil, nil, nil, playgroundID)
+	return r.client.ContainerCreate(r.ctx, c, restrictHostConfig, nil, nil, playgroundID)
 }
 
 func (r *ContainerRepositoryImpl) start(id string) error {
