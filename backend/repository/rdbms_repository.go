@@ -22,17 +22,17 @@ func dataSourceName(driverName string, host string) (string, error) {
 	}
 }
 
-type DBRepository interface {
+type RDBMSRepository interface {
 	Execute(c *types.ContainerJSON, query string) (*model.ExecuteResult, error)
 }
 
-type DBRepositoryImpl struct{}
+type RDBMSRepositoryImpl struct{}
 
-func NewDBRepository() DBRepository {
-	return &DBRepositoryImpl{}
+func NewRDBMSRepository() RDBMSRepository {
+	return &RDBMSRepositoryImpl{}
 }
 
-func (dr DBRepositoryImpl) Execute(c *types.ContainerJSON, query string) (*model.ExecuteResult, error) {
+func (dr RDBMSRepositoryImpl) Execute(c *types.ContainerJSON, query string) (*model.ExecuteResult, error) {
 	driverName := c.Config.Image
 	var host string
 	if c.Name[0] == '/' {

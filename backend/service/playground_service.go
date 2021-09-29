@@ -16,17 +16,17 @@ type PlaygroundService interface {
 }
 
 type PlaygroundServiceImpl struct {
-	cr  repository.ContainerRepository
-	dbr repository.DBRepository
+	cr repository.ContainerRepository
+	rr repository.RDBMSRepository
 }
 
 func NewPlaygroundService(
 	cr repository.ContainerRepository,
-	dbr repository.DBRepository,
+	rr repository.RDBMSRepository,
 ) PlaygroundService {
 	return &PlaygroundServiceImpl{
-		cr:  cr,
-		dbr: dbr,
+		cr: cr,
+		rr: rr,
 	}
 }
 
@@ -88,7 +88,7 @@ func (s *PlaygroundServiceImpl) Execute(id string, query string) (*model.Execute
 		return nil, err
 	}
 
-	r, err := s.dbr.Execute(cj, query)
+	r, err := s.rr.Execute(cj, query)
 	if err != nil {
 		return nil, err
 	}

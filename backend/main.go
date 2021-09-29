@@ -25,8 +25,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	dbr := repository.NewDBRepository()
-	ps := service.NewPlaygroundService(cr, dbr)
+	rr := repository.NewRDBMSRepository()
+	ps := service.NewPlaygroundService(cr, rr)
 	ph := handler.NewPlaygroundsHandler(ps)
 
 	// Routes
