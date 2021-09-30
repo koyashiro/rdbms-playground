@@ -8,19 +8,13 @@
    cp .env.example .env
    ```
 
-2. Build Docker image
+2. Build Docker image and start development server
 
    ```sh
-   docker-compose build
+   docker-compose up --build
    ```
 
-3. Start development server
-
-   ```sh
-   docker-compose up
-   ```
-
-4. Open the following link in your browser
+3. Open the following link in your browser
 
    <http://localhost:3000>
 
