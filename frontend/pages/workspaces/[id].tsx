@@ -1,16 +1,29 @@
 import type { NextPage } from "next";
 import { useRouter } from "next/dist/client/router";
 import Head from "next/head";
+import Error from "next/error";
 
 import * as Api from "../../lib/api/api";
 import Terminal from "../../lib/components/terminal";
 
 const Workspace: NextPage = () => {
   const router = useRouter();
-  const { id } = router.query;
-  if (typeof id !== "string") {
-    console.error(`id is not string, ${typeof id}`);
-    throw new Error("id is not string");
+
+  const id = (() => {
+    const { id } = router.query;
+    if (id == null) {
+      return id;
+    }
+
+    if (Array.isArray(id)) {
+      return id[0];
+    }
+
+    return id;
+  })();
+
+  if (id == null) {
+    return <Error statusCode={404} />;
   }
 
   return (
