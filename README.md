@@ -18,6 +18,12 @@
 
    <http://localhost:3000>
 
+## Clean container
+
+```sh
+docker compose run --rm container-cleaner
+```
+
 ## Trouble Shooting
 
 - Due to the upgrade of Docker Compose, the `docker-compose` command may have been replaced by `docker compose`.
