@@ -118,8 +118,15 @@ func (r *ContainerRepositoryImpl) get(id string) (*types.ContainerJSON, error) {
 	return &c, nil
 }
 
+var limitsProcess = int64(50)
 var restrictHostConfig = &container.HostConfig{
 	CapDrop: []string{"fsetid", "kill", "setpcap", "net_raw", "sys_chroot", "mknod", "audit_write", "setfcap"},
+	Resources: container.Resources{
+		CPUQuota:  10000,
+		CPUPeriod: 5000,
+		Memory:    209_715_200,
+		PidsLimit: &limitsProcess,
+	},
 }
 
 func config(workspaceID string, db string) (*container.Config, error) {
