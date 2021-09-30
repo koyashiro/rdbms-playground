@@ -24,6 +24,6 @@
 
    <http://localhost:3000>
 
-
 ## Trouble Shooting
-+ Due to the upgrade of Docker Compose, the `docker-compose` command may have been replaced by `docker compose`.
+
+- Due to the upgrade of Docker Compose, the `docker-compose` command may have been replaced by `docker compose`.
