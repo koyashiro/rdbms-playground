@@ -1,28 +1,14 @@
-import type { NextPage } from "next";
-import { useRouter } from "next/dist/client/router";
-import Head from "next/head";
+import type { NextPage, GetServerSideProps } from "next";
 import Error from "next/error";
+import Head from "next/head";
 
 import * as Api from "../../lib/api/api";
 import Terminal from "../../lib/components/terminal";
 
-const Workspace: NextPage = () => {
-  const router = useRouter();
+type Props = { workspace: Api.Workspace };
 
-  const id = (() => {
-    const { id } = router.query;
-    if (id == null) {
-      return id;
-    }
-
-    if (Array.isArray(id)) {
-      return id[0];
-    }
-
-    return id;
-  })();
-
-  if (id == null) {
+const Workspace: NextPage<Props> = ({ workspace }) => {
+  if (!workspace) {
     return <Error statusCode={404} />;
   }
 
@@ -37,7 +23,7 @@ const Workspace: NextPage = () => {
       <main className="flex flex-col items-center justify-center w-screen h-screen">
         <Terminal
           command={async (cmd: string) => {
-            const res = await Api.postWorkspaceQuery(id, {
+            const res = await Api.postWorkspaceQuery(workspace.id, {
               query: cmd,
             }).catch(() => ({
               error: "API request failure",
@@ -48,6 +34,37 @@ const Workspace: NextPage = () => {
       </main>
     </div>
   );
+};
+
+export const getServerSideProps: GetServerSideProps<Props> = async (
+  context
+) => {
+  const id = (() => {
+    const { id } = context.query;
+    if (id == null) {
+      return id;
+    }
+
+    if (Array.isArray(id)) {
+      return id[0];
+    }
+
+    return id;
+  })();
+
+  if (!id) {
+    return { notFound: true };
+  }
+
+  const result = await Api.getWorkspaceById(id).catch(() => ({
+    error: "API request failure",
+  }));
+
+  if ("error" in result) {
+    return { notFound: true };
+  }
+
+  return { props: { workspace: result } };
 };
 
 export default Workspace;

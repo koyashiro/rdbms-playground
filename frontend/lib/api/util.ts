@@ -11,8 +11,11 @@ export const fetchApi = async (
   }: { parameter?: Record<string, string>; body?: Record<string, string> }
 ): Promise<Response> => {
   const { publicRuntimeConfig } = getConfig();
-  const apiHostUri = publicRuntimeConfig.apiHostUri;
-
+  // TODO: use environment variable
+  const apiHostUri =
+    typeof window === "undefined"
+      ? "http://backend:1323"
+      : publicRuntimeConfig.apiHostUri;
   const parameterString = parameter
     ? "?" + new URLSearchParams(parameter).toString()
     : "";

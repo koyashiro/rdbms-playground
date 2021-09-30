@@ -46,7 +46,7 @@ export const getAllWorkspaces = async (): Promise<
 };
 
 export const getWorkspaceById = async (
-  id: number
+  id: string
 ): Promise<Workspace | ErrorResponse> => {
   const res = await fetchApi("GET", `/workspaces/${id}`, {});
   const json = await res.json();
