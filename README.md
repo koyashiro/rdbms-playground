@@ -1,5 +1,7 @@
 # rdbms-playground
 
+## How to run
+
 1. Create `.env`
 
    ```sh
@@ -21,3 +23,7 @@
 4. Open the following link in your browser
 
    <http://localhost:3000>
+
+## Trouble Shooting
+
+- Due to the upgrade of Docker Compose, the `docker-compose` command may have been replaced by `docker compose`.
