@@ -1,0 +1,35 @@
+version: '3.9'
+
+services:
+  backend:
+    build:
+      context: backend
+      target: production
+    environment:
+      PLAYGROUND_NETWORK: ${PLAYGROUND_NETWORK:-playground-network}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 1323:1323
+
+  frontend:
+    build:
+      context: frontend
+      target: production
+    environment:
+      API_HOST_URI: ${RDBMS_PLAYGROUND_API_HOST_URI}
+    ports:
+      - 3000:3000
+
+  container-cleaner:
+    image: docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: sh -c 'docker container ls --filter label=type=playground -q | xargs --no-run-if-empty docker rm --force'
+    profiles:
+      - clean
+
+networks:
+  default:
+    name: ${PLAYGROUND_NETWORK:-playground-network}
+
