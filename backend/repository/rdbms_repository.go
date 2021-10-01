@@ -12,28 +12,6 @@ import (
 	"github.com/koyashiro/rdbms-playground/backend/model"
 )
 
-func driverName(image string) (string, error) {
-	switch image {
-	case "postgres":
-		return "postgres", nil
-	case "mysql", "mariadb":
-		return "mysql", nil
-	default:
-		return "", errors.New("invalid image")
-	}
-}
-
-func dataSourceName(driverName string, host string) (string, error) {
-	switch driverName {
-	case "postgres":
-		return "host=" + host + " port=5432 user=postgres password=password dbname=postgres sslmode=disable", nil
-	case "mysql", "mariadb":
-		return "root:password@tcp(" + host + ":3306)/mysql", nil
-	default:
-		return "", errors.New("invalid driverName")
-	}
-}
-
 type RDBMSRepository interface {
 	Execute(c *types.ContainerJSON, query string) (*model.ExecuteResult, error)
 }
@@ -110,4 +88,26 @@ func (dr RDBMSRepositoryImpl) Execute(c *types.ContainerJSON, query string) (*mo
 	}
 
 	return &model.ExecuteResult{Columns: columns, Rows: rows}, nil
+}
+
+func driverName(image string) (string, error) {
+	switch image {
+	case "postgres":
+		return "postgres", nil
+	case "mysql", "mariadb":
+		return "mysql", nil
+	default:
+		return "", errors.New("invalid image")
+	}
+}
+
+func dataSourceName(driverName string, host string) (string, error) {
+	switch driverName {
+	case "postgres":
+		return "host=" + host + " port=5432 user=postgres password=password dbname=postgres sslmode=disable", nil
+	case "mysql", "mariadb":
+		return "root:password@tcp(" + host + ":3306)/mysql", nil
+	default:
+		return "", errors.New("invalid driverName")
+	}
 }
