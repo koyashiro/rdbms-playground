@@ -11,7 +11,7 @@ COPY . .
 RUN yarn install --frozen-lockfile
 RUN yarn build
 
-FROM node:latest as production
+FROM gcr.io/distroless/nodejs:latest as production
 WORKDIR /app
 COPY --from=build /work/.next /app/.next
 COPY --from=build /work/package.json /app/package.json
