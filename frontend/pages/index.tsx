@@ -1,4 +1,4 @@
-import type { NextPage } from "next";
+import type { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/dist/client/router";
 import Head from "next/head";
 
@@ -75,5 +75,12 @@ const Home: NextPage = () => {
     </div>
   );
 };
+
+// For automatic static optimization suppression
+export const getServerSideProps: GetServerSideProps = async (_) => {
+  return {
+    props: {},
+  }
+}
 
 export default Home;
