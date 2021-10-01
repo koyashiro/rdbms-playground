@@ -18,7 +18,9 @@ const Home: NextPage = () => {
   const router = useRouter();
   const [state, setState] = useState<State>({ state: "NORMAL" });
 
-  const onClick = async (db: "mysql" | "postgres"): Promise<void> => {
+  const onClick = async (
+    db: "mysql" | "postgres" | "mariadb"
+  ): Promise<void> => {
     const res = await Api.postWorkspace(db).catch(() => ({
       error: "API request failure",
     }));
@@ -62,6 +64,13 @@ const Home: NextPage = () => {
             onClick={() => onClick("mysql")}
           >
             Create MySQL Workspace
+          </button>
+
+          <button
+            className="px-4 py-2 m-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700"
+            onClick={() => onClick("mariadb")}
+          >
+            Create MariaDB Workspace
           </button>
 
           <button

@@ -12,11 +12,22 @@ import (
 	"github.com/koyashiro/rdbms-playground/backend/model"
 )
 
+func driverName(image string) (string, error) {
+	switch image {
+	case "postgres":
+		return "postgres", nil
+	case "mysql", "mariadb":
+		return "mysql", nil
+	default:
+		return "", errors.New("invalid image")
+	}
+}
+
 func dataSourceName(driverName string, host string) (string, error) {
 	switch driverName {
 	case "postgres":
 		return "host=" + host + " port=5432 user=postgres password=password dbname=postgres sslmode=disable", nil
-	case "mysql":
+	case "mysql", "mariadb":
 		return "root:password@tcp(" + host + ":3306)/mysql", nil
 	default:
 		return "", errors.New("invalid driverName")
@@ -34,7 +45,11 @@ func NewRDBMSRepository() RDBMSRepository {
 }
 
 func (dr RDBMSRepositoryImpl) Execute(c *types.ContainerJSON, query string) (*model.ExecuteResult, error) {
-	driverName := c.Config.Image
+	driverName, err := driverName(c.Config.Image)
+	if err != nil {
+		return nil, err
+	}
+
 	var host string
 	if c.Name[0] == '/' {
 		host = c.Name[1:]

@@ -134,6 +134,15 @@ func config(workspaceID string, db string) (*container.Config, error) {
 			},
 			Env: []string{"MYSQL_ROOT_PASSWORD=" + password},
 		}, nil
+	case "mariadb":
+		return &container.Config{
+			Image: "mariadb",
+			Labels: map[string]string{
+				"type": "playground",
+				"wid":  workspaceID,
+			},
+			Env: []string{"MARIADB_ROOT_PASSWORD=" + password},
+		}, nil
 	case "postgres":
 		return &container.Config{
 			Image: "postgres",

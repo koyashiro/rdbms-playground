@@ -56,7 +56,7 @@ export const getWorkspaceById = async (
 };
 
 export const postWorkspace = async (
-  db: "mysql" | "postgres"
+  db: "mysql" | "postgres" | "mariadb"
 ): Promise<Workspace | ErrorResponse> => {
   // TODO: db selection
   const res = await fetchApi("POST", `/workspaces`, {
