@@ -11,7 +11,7 @@
 2. Build Docker image and start development server
 
    ```sh
-   docker-compose up --build
+   docker compose up --build
    ```
 
 3. Open the following link in your browser
