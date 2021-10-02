@@ -1,4 +1,4 @@
-FROM node:latest as development
+FROM node:16.10.0-buster as development
 WORKDIR /app
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
@@ -9,7 +9,7 @@ FROM development as build
 RUN yarn build
 RUN yarn install --production --frozen-lockfile
 
-FROM gcr.io/distroless/nodejs:latest as production
+FROM node:16.10.0-slim as production
 WORKDIR /app
 COPY --from=build /app/package.json /app/package.json
 COPY --from=build /app/yarn.lock /app/yarn.lock
@@ -17,4 +17,4 @@ COPY --from=build /app/node_modules /app/node_modules
 COPY --from=build /app/.next /app/.next
 COPY --from=build /app/next.config.js /app/next.config.js
 
-CMD ["/app/node_modules/.bin/next", "start", "--hostname", "0.0.0.0", "--port", "3000"]
+CMD ["yarn", "start", "--hostname", "0.0.0.0", "--port", "3000"]
