@@ -5,18 +5,16 @@ RUN yarn install --frozen-lockfile
 COPY . .
 CMD ["yarn", "dev", "--hostname", "0.0.0.0", "--port", "3000"]
 
-FROM node:latest as build
-WORKDIR /work
-COPY . .
-RUN yarn install --frozen-lockfile
+FROM development as build
 RUN yarn build
+RUN yarn install --production --frozen-lockfile
 
 FROM gcr.io/distroless/nodejs:latest as production
 WORKDIR /app
-COPY --from=build /work/.next /app/.next
-COPY --from=build /work/package.json /app/package.json
-COPY --from=build /work/yarn.lock /app/yarn.lock
-COPY --from=build /work/next.config.js /app/next.config.js
-RUN yarn install --production --frozen-lockfile
+COPY --from=build /app/package.json /app/package.json
+COPY --from=build /app/yarn.lock /app/yarn.lock
+COPY --from=build /app/node_modules /app/node_modules
+COPY --from=build /app/.next /app/.next
+COPY --from=build /app/next.config.js /app/next.config.js
 
-CMD ["yarn", "start", "--hostname", "0.0.0.0", "--port", "3000"]
+CMD ["/app/node_modules/.bin/next", "start", "--hostname", "0.0.0.0", "--port", "3000"]
