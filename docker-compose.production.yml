@@ -21,14 +21,6 @@ services:
     ports:
       - 3000:3000
 
-  container-cleaner:
-    image: docker
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: sh -c 'docker container ls --filter label=type=playground -q | xargs --no-run-if-empty docker rm --force'
-    profiles:
-      - clean
-
 networks:
   default:
     name: ${PLAYGROUND_NETWORK:-playground-network}

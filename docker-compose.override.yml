@@ -1,0 +1,10 @@
+version: '3.9'
+
+services:
+  container-cleaner:
+    image: docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: sh -c 'docker container ls --filter label=type=playground -q | xargs --no-run-if-empty docker rm --force'
+    profiles:
+      - clean
