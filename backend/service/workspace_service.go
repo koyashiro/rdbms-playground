@@ -16,22 +16,22 @@ type WorkspaceService interface {
 }
 
 type WorkspaceServiceImpl struct {
-	cr repository.ContainerRepository
-	rr repository.RDBMSRepository
+	containerRepository repository.ContainerRepository
+	rdbmsRepository     repository.RDBMSRepository
 }
 
 func NewWorkspaceService(
-	cr repository.ContainerRepository,
-	rr repository.RDBMSRepository,
+	containerRepository repository.ContainerRepository,
+	rdbmsRepository repository.RDBMSRepository,
 ) WorkspaceService {
 	return &WorkspaceServiceImpl{
-		cr: cr,
-		rr: rr,
+		containerRepository: containerRepository,
+		rdbmsRepository:     rdbmsRepository,
 	}
 }
 
 func (s *WorkspaceServiceImpl) GetAll() ([]*model.Workspace, error) {
-	containers, err := s.cr.GetAll()
+	containers, err := s.containerRepository.GetAll()
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (s *WorkspaceServiceImpl) GetAll() ([]*model.Workspace, error) {
 }
 
 func (s *WorkspaceServiceImpl) Get(id string) (*model.Workspace, error) {
-	cj, err := s.cr.Get(id)
+	cj, err := s.containerRepository.Get(id)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (s *WorkspaceServiceImpl) Get(id string) (*model.Workspace, error) {
 func (s *WorkspaceServiceImpl) Create(db string) (*model.Workspace, error) {
 	id := uuid.New().String()
 
-	cj, err := s.cr.Create(id, db)
+	cj, err := s.containerRepository.Create(id, db)
 	if err != nil {
 		return nil, err
 	}
@@ -79,16 +79,16 @@ func (s *WorkspaceServiceImpl) Create(db string) (*model.Workspace, error) {
 }
 
 func (s *WorkspaceServiceImpl) Destroy(id string) error {
-	return s.cr.Delete(id)
+	return s.containerRepository.Delete(id)
 }
 
 func (s *WorkspaceServiceImpl) Execute(id string, query string) (*model.ExecuteResult, error) {
-	cj, err := s.cr.Get(id)
+	cj, err := s.containerRepository.Get(id)
 	if err != nil {
 		return nil, err
 	}
 
-	r, err := s.rr.Execute(cj, query)
+	r, err := s.rdbmsRepository.Execute(cj, query)
 	if err != nil {
 		return nil, err
 	}
