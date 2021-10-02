@@ -45,7 +45,15 @@ func (r *ContainerRepositoryImpl) GetAll() ([]types.Container, error) {
 	r.Lock()
 	defer r.Unlock()
 
-	return r.getAll()
+	clo := types.ContainerListOptions{
+		Filters: filters.NewArgs(filters.Arg("label", "type=playground")),
+	}
+	cl, err := r.client.ContainerList(r.ctx, clo)
+	if err != nil {
+		return nil, err
+	}
+
+	return cl, nil
 }
 
 func (r *ContainerRepositoryImpl) Get(id string) (*types.ContainerJSON, error) {
@@ -59,17 +67,21 @@ func (r *ContainerRepositoryImpl) Create(workspaceID string, db string) (*types.
 	r.Lock()
 	defer r.Unlock()
 
-	ccb, err := r.create(workspaceID, db)
+	config, err := config(workspaceID, db)
 	if err != nil {
 		return nil, err
 	}
 
-	err = r.start(ccb.ID)
+	rhc := &container.HostConfig{
+		CapDrop: []string{"fsetid", "kill", "setpcap", "net_raw", "sys_chroot", "mknod", "audit_write", "setfcap"},
+	}
+	ccb, err := r.client.ContainerCreate(r.ctx, config, rhc, nil, nil, workspaceID)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := r.client.NetworkConnect(r.ctx, env.Network, ccb.ID, nil); err != nil {
+	err = r.client.NetworkConnect(r.ctx, env.Network, ccb.ID, nil)
+	if err != nil {
 		return nil, err
 	}
 
@@ -97,18 +109,6 @@ func (r *ContainerRepositoryImpl) Delete(id string) error {
 	})
 }
 
-func (r *ContainerRepositoryImpl) getAll() ([]types.Container, error) {
-	clo := types.ContainerListOptions{
-		Filters: filters.NewArgs(filters.Arg("label", "type=playground")),
-	}
-	cl, err := r.client.ContainerList(r.ctx, clo)
-	if err != nil {
-		return nil, err
-	}
-
-	return cl, nil
-}
-
 func (r *ContainerRepositoryImpl) get(id string) (*types.ContainerJSON, error) {
 	c, err := r.client.ContainerInspect(r.ctx, id)
 	if err != nil {
@@ -116,10 +116,6 @@ func (r *ContainerRepositoryImpl) get(id string) (*types.ContainerJSON, error) {
 	}
 
 	return &c, nil
-}
-
-var restrictHostConfig = &container.HostConfig{
-	CapDrop: []string{"fsetid", "kill", "setpcap", "net_raw", "sys_chroot", "mknod", "audit_write", "setfcap"},
 }
 
 func config(workspaceID string, db string) (*container.Config, error) {
@@ -155,17 +151,4 @@ func config(workspaceID string, db string) (*container.Config, error) {
 	default:
 		return nil, errors.New("invalid db")
 	}
-}
-
-func (r *ContainerRepositoryImpl) create(workspaceID string, db string) (container.ContainerCreateCreatedBody, error) {
-	c, err := config(workspaceID, db)
-	if err != nil {
-		return container.ContainerCreateCreatedBody{}, err
-	}
-
-	return r.client.ContainerCreate(r.ctx, c, restrictHostConfig, nil, nil, workspaceID)
-}
-
-func (r *ContainerRepositoryImpl) start(id string) error {
-	return r.client.ContainerStart(r.ctx, id, types.ContainerStartOptions{})
 }
