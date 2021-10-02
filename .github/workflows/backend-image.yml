@@ -6,9 +6,11 @@ on:
       - main
     paths:
       - "backend/**"
+      - ".github/workflows/backend-image.yml"
   pull_request:
     paths:
       - "backend/**"
+      - ".github/workflows/backend-image.yml"
 
 jobs:
   push_to_registry:
