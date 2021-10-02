@@ -2,6 +2,7 @@ version: '3.9'
 
 services:
   backend:
+    image: rdbms-playground-backend
     build:
       context: backend
       target: production
@@ -13,6 +14,7 @@ services:
       - 1323:1323
 
   frontend:
+    image: rdbms-playground-frontend
     build:
       context: frontend
       target: production
