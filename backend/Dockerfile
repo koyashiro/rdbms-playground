@@ -6,10 +6,7 @@ RUN go get -u github.com/cosmtrek/air
 COPY . .
 CMD ["air"]
 
-FROM golang:latest as build
-WORKDIR /go/src/github.com/koyashiro/rdbms-playground
-COPY . .
-COPY --from=development /go/pkg /go/pkg
+FROM development as build
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o app .
 
 FROM gcr.io/distroless/static:latest as production
