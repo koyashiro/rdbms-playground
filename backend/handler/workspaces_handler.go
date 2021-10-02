@@ -88,7 +88,7 @@ func (h *WorkspacesHandlerImpl) PostWorkspace(c echo.Context) error {
 // DELETE /workspaces/:id
 func (h *WorkspacesHandlerImpl) DeleteWorkspace(c echo.Context) error {
 	id := c.Param("id")
-	if err := h.workspaceService.Destroy(id); err != nil {
+	if err := h.workspaceService.Delete(id); err != nil {
 		c.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}
 		return c.JSON(http.StatusInternalServerError, res)

@@ -11,7 +11,7 @@ type WorkspaceService interface {
 	GetAll() ([]*model.Workspace, error)
 	Get(id string) (*model.Workspace, error)
 	Create(db string) (*model.Workspace, error)
-	Destroy(id string) error
+	Delete(id string) error
 	Execute(id string, query string) (*model.ExecuteResult, error)
 }
 
@@ -78,7 +78,7 @@ func (s *WorkspaceServiceImpl) Create(db string) (*model.Workspace, error) {
 	return p, nil
 }
 
-func (s *WorkspaceServiceImpl) Destroy(id string) error {
+func (s *WorkspaceServiceImpl) Delete(id string) error {
 	return s.containerRepository.Delete(id)
 }
 
