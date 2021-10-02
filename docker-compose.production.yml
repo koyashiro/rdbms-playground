@@ -32,4 +32,3 @@ services:
 networks:
   default:
     name: ${PLAYGROUND_NETWORK:-playground-network}
-
