@@ -1,4 +1,4 @@
-FROM node:16.10.0-buster as development
+FROM node:16.10.0 as development
 WORKDIR /app
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
