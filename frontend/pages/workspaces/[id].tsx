@@ -3,7 +3,7 @@ import Error from "next/error";
 import Head from "next/head";
 
 import * as Api from "../../lib/api/api";
-import Terminal from "../../lib/components/terminal";
+import Terminal from "../../components/terminal";
 
 type Props = { workspace: Api.Workspace };
 
