@@ -89,7 +89,7 @@ const Home: NextPage = () => {
 export const getServerSideProps: GetServerSideProps = async (_) => {
   return {
     props: {},
-  }
-}
+  };
+};
 
 export default Home;

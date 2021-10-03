@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "fmt": "prettier --write pages lib"
+    "fmt": "prettier --write pages components lib",
+    "fmt:check": "prettier --check pages components lib"
   },
   "dependencies": {
     "next": "11.1.2",
