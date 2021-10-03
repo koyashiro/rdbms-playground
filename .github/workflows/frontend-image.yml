@@ -25,7 +25,7 @@ jobs:
       with:
         node-version: 16.10.0
 
-    - name: Install NPM packages
+    - name: Install dependencies
       working-directory: ./frontend
       run: yarn install --frozen-lockfile
 
@@ -33,11 +33,11 @@ jobs:
       working-directory: ./frontend
       run: yarn fmt:check
 
-    - name: Build Next.js app
+    - name: Lint
       working-directory: ./frontend
       run: yarn lint
 
-    - name: Build Next.js app
+    - name: Build
       working-directory: ./frontend
       run: yarn build
 
