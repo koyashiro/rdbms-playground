@@ -13,8 +13,27 @@ on:
       - ".github/workflows/backend-image.yml"
 
 jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out the repo
+      uses: actions/checkout@v2
+
+    - name: Set up Go 1.17.1
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17.1
+
+    - name: Download dependencies
+      run: go mod download
+
+    - name: Test
+      run: go test -v
+
   push_to_registry:
     name: Build and Publish Docker image to GitHub Packages
+    needs: test
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: rdbms-playground-backend
