@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/containerd/containerd v1.5.2 // indirect
-	github.com/docker/docker v20.10.8+incompatible
+	github.com/docker/docker v20.10.9+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/go-redis/redis/v8 v8.11.3
 	github.com/go-sql-driver/mysql v1.6.0
