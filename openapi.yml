@@ -1,0 +1,181 @@
+openapi: 3.1.0
+
+info:
+  title: RDBMS Playground
+  description: RDBMS Playground
+  license:
+    name: MIT
+    identifier: MIT
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000
+
+tags:
+  - name: workspace
+    description: Playground workspace
+
+paths:
+  /workspaces:
+    get:
+      tags:
+        - workspace
+      summary: Get workspaces
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Workspace"
+
+    post:
+      tags:
+        - workspace
+      summary: Create workspace
+      requestBody:
+        description: Created workspace object
+        content:
+          application/json:
+            schema:
+              required:
+                - db
+              type: object
+              properties:
+                db:
+                  type: string
+                  example: mysql
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workspace"
+
+  /workspaces/{workspaceId}:
+    get:
+      tags:
+        - workspace
+      summary: Find workspace by ID
+      parameters:
+        - name: workspaceId
+          in: path
+          description: ID of workspace to return
+          required: true
+          schema:
+            type: string
+            example: 2c5ff685-b9f3-413a-a1b5-01fad9907905
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workspace"
+    delete:
+      tags:
+        - workspace
+      summary: Delete workspace by ID
+      parameters:
+        - name: workspaceId
+          in: path
+          description: ID of workspace to delete
+          required: true
+          schema:
+            type: string
+            example: 2c5ff685-b9f3-413a-a1b5-01fad9907905
+      responses:
+        204:
+          description: Successful operation
+
+  /workspaces/{workspaceId}/query:
+    post:
+      tags:
+        - workspace
+      summary: Execute query
+      parameters:
+        - name: workspaceId
+          in: path
+          description: ID of workspace to return
+          required: true
+          schema:
+            type: string
+            example: 2c5ff685-b9f3-413a-a1b5-01fad9907905
+      requestBody:
+        description: Query
+        content:
+          application/json:
+            schema:
+              required:
+                - query
+              type: object
+              properties:
+                query:
+                  type: string
+                  example: SELECT version();
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QueryResult"
+
+components:
+  schemas:
+    Workspace:
+      required:
+        - id
+        - db
+      type: object
+      properties:
+        id:
+          type: string
+        db:
+          type: string
+      example:
+        id: 2c5ff685-b9f3-413a-a1b5-01fad9907905
+        db: mysql
+
+    QueryResult:
+      required:
+        - columns
+        - rows
+      type: object
+      properties:
+        columns:
+          type: array
+          items:
+            required:
+              - name
+              - databaseType
+            type: object
+            properties:
+              name:
+                type: string
+              databaseType:
+                type: string
+              nullable:
+                type: boolean
+              length:
+                type: integer
+              precision:
+                type: integer
+              scale:
+                type: integer
+        rows:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+      example:
+        columns:
+          - name: version()
+            databaseType: VARCHAR
+            nullable: false
+        rows:
+          - 8.0.26
