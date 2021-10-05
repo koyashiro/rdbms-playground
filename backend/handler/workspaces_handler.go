@@ -14,19 +14,19 @@ type ErrorResponse struct {
 
 type WorkspacesHandler interface {
 	// GET /workspaces
-	GetWorkspaces(c echo.Context) error
+	Index(c echo.Context) error
 
 	// GET /workspaces/:id
-	GetWorkspace(c echo.Context) error
+	Show(c echo.Context) error
 
 	// POST /workspaces
-	PostWorkspace(c echo.Context) error
+	Create(c echo.Context) error
 
 	// DELETE /workspaces/:id
-	DeleteWorkspace(c echo.Context) error
+	Delete(c echo.Context) error
 
 	// POST /workspaces/:id/query
-	ExecuteQuery(c echo.Context) error
+	Query(c echo.Context) error
 }
 
 type WorkspacesHandlerImpl struct {
@@ -38,7 +38,7 @@ func NewWorkspacesHandler(service service.WorkspaceService) WorkspacesHandler {
 }
 
 // GET /workspaces
-func (h *WorkspacesHandlerImpl) GetWorkspaces(c echo.Context) error {
+func (h *WorkspacesHandlerImpl) Index(c echo.Context) error {
 	ps, err := h.workspaceService.GetAll()
 	if err != nil {
 		c.Logger().Error(err)
@@ -50,7 +50,7 @@ func (h *WorkspacesHandlerImpl) GetWorkspaces(c echo.Context) error {
 }
 
 // GET /workspaces/:id
-func (h *WorkspacesHandlerImpl) GetWorkspace(c echo.Context) error {
+func (h *WorkspacesHandlerImpl) Show(c echo.Context) error {
 	id := c.Param("id")
 	p, err := h.workspaceService.Get(id)
 	if err != nil {
@@ -63,7 +63,7 @@ func (h *WorkspacesHandlerImpl) GetWorkspace(c echo.Context) error {
 }
 
 // POST /workspaces
-func (h *WorkspacesHandlerImpl) PostWorkspace(c echo.Context) error {
+func (h *WorkspacesHandlerImpl) Create(c echo.Context) error {
 	type Create struct {
 		Db string `json:"db"`
 	}
@@ -86,7 +86,7 @@ func (h *WorkspacesHandlerImpl) PostWorkspace(c echo.Context) error {
 }
 
 // DELETE /workspaces/:id
-func (h *WorkspacesHandlerImpl) DeleteWorkspace(c echo.Context) error {
+func (h *WorkspacesHandlerImpl) Delete(c echo.Context) error {
 	id := c.Param("id")
 	if err := h.workspaceService.Delete(id); err != nil {
 		c.Logger().Error(err)
@@ -98,7 +98,7 @@ func (h *WorkspacesHandlerImpl) DeleteWorkspace(c echo.Context) error {
 }
 
 // POST /workspaces/:id/query
-func (h *WorkspacesHandlerImpl) ExecuteQuery(c echo.Context) error {
+func (h *WorkspacesHandlerImpl) Query(c echo.Context) error {
 	id := c.Param("id")
 
 	type Query struct {

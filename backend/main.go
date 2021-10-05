@@ -21,20 +21,23 @@ func main() {
 	e.Use(middleware.CORS())
 
 	// TODO: replace DI
-	cr, err := repository.NewContainerRepository()
-	if err != nil {
-		panic(err)
-	}
-	rr := repository.NewRDBMSRepository()
-	ps := service.NewWorkspaceService(cr, rr)
-	ph := handler.NewWorkspacesHandler(ps)
+
+	// Repositories
+	containerRepository := repository.NewContainerRepository()
+	rdbmsRepository := repository.NewRDBMSRepository()
+
+	// Services
+	playgroundService := service.NewWorkspaceService(containerRepository, rdbmsRepository)
+
+	// Handers
+	playgroundHandler := handler.NewWorkspacesHandler(playgroundService)
 
 	// Routes
-	e.GET("/workspaces", ph.GetWorkspaces)
-	e.GET("/workspaces/:id", ph.GetWorkspace)
-	e.POST("/workspaces", ph.PostWorkspace)
-	e.DELETE("/workspaces/:id", ph.DeleteWorkspace)
-	e.POST("/workspaces/:id/query", ph.ExecuteQuery)
+	e.GET("/workspaces", playgroundHandler.Index)
+	e.GET("/workspaces/:id", playgroundHandler.Show)
+	e.POST("/workspaces", playgroundHandler.Create)
+	e.DELETE("/workspaces/:id", playgroundHandler.Delete)
+	e.POST("/workspaces/:id/query", playgroundHandler.Query)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":" + port))

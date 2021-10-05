@@ -27,7 +27,7 @@ type ContainerRepositoryImpl struct {
 	sync.Mutex //TODO narrow the lock range
 }
 
-func NewContainerRepository() (ContainerRepository, error) {
+func NewContainerRepository() ContainerRepository {
 	ctx := context.Background()
 	c, err := client.NewClientWithOpts(
 		client.WithHost(client.DefaultDockerHost),
@@ -35,10 +35,10 @@ func NewContainerRepository() (ContainerRepository, error) {
 	)
 
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
-	return &ContainerRepositoryImpl{ctx: ctx, client: c}, nil
+	return &ContainerRepositoryImpl{ctx: ctx, client: c}
 }
 
 func (r *ContainerRepositoryImpl) GetAll() ([]types.Container, error) {
