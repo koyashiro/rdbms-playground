@@ -26,7 +26,7 @@ docker compose run --rm container-cleaner
 
 ## API Documentation
 
-https://koyashiro.github.io/rdbms-playground
+<https://koyashiro.github.io/rdbms-playground>
 
 ## Trouble Shooting
 
