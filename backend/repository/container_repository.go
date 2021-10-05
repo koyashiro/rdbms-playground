@@ -80,6 +80,10 @@ func (r *ContainerRepositoryImpl) Create(workspaceID string, db string) (*types.
 		return nil, err
 	}
 
+	if err := r.client.ContainerStart(r.ctx, ccb.ID, types.ContainerStartOptions{}); err != nil {
+		return nil, err
+	}
+
 	err = r.client.NetworkConnect(r.ctx, env.Network, ccb.ID, nil)
 	if err != nil {
 		return nil, err
