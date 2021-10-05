@@ -40,8 +40,8 @@ func (s *WorkspaceServiceImpl) GetAll() ([]*model.Workspace, error) {
 	for i, container := range containers {
 		c := model.NewContainerFromContainer(&container)
 		workspaces[i] = &model.Workspace{
-			ID:        c.Name,
-			Container: c,
+			ID:    c.Name,
+			RDBMS: c.Image,
 		}
 	}
 
@@ -56,8 +56,8 @@ func (s *WorkspaceServiceImpl) Get(id string) (*model.Workspace, error) {
 
 	c := model.NewContainerFromContainerJSON(cj)
 	return &model.Workspace{
-		ID:        c.Name,
-		Container: model.NewContainerFromContainerJSON(cj),
+		ID:    c.Name,
+		RDBMS: c.Image,
 	}, nil
 }
 
@@ -71,8 +71,8 @@ func (s *WorkspaceServiceImpl) Create(db string) (*model.Workspace, error) {
 
 	c := model.NewContainerFromContainerJSON(cj)
 	p := &model.Workspace{
-		ID:        c.Name,
-		Container: c,
+		ID:    c.Name,
+		RDBMS: c.Image,
 	}
 
 	return p, nil
