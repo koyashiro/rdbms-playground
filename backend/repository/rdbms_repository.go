@@ -13,7 +13,7 @@ import (
 )
 
 type RDBMSRepository interface {
-	Execute(c *types.ContainerJSON, query string) (*model.ExecuteResult, error)
+	Execute(c *types.ContainerJSON, query string) (*model.QueryResult, error)
 }
 
 type RDBMSRepositoryImpl struct{}
@@ -22,7 +22,7 @@ func NewRDBMSRepository() RDBMSRepository {
 	return &RDBMSRepositoryImpl{}
 }
 
-func (dr RDBMSRepositoryImpl) Execute(c *types.ContainerJSON, query string) (*model.ExecuteResult, error) {
+func (dr RDBMSRepositoryImpl) Execute(c *types.ContainerJSON, query string) (*model.QueryResult, error) {
 	driverName, err := driverName(c.Config.Image)
 	if err != nil {
 		return nil, err
@@ -87,7 +87,7 @@ func (dr RDBMSRepositoryImpl) Execute(c *types.ContainerJSON, query string) (*mo
 		rows = append(rows, row)
 	}
 
-	return &model.ExecuteResult{Columns: columns, Rows: rows}, nil
+	return &model.QueryResult{Columns: columns, Rows: rows}, nil
 }
 
 func driverName(image string) (string, error) {

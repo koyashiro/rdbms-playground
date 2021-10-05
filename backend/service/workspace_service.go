@@ -12,7 +12,7 @@ type WorkspaceService interface {
 	Get(id string) (*model.Workspace, error)
 	Create(db string) (*model.Workspace, error)
 	Delete(id string) error
-	Execute(id string, query string) (*model.ExecuteResult, error)
+	Execute(id string, query string) (*model.QueryResult, error)
 }
 
 type WorkspaceServiceImpl struct {
@@ -40,8 +40,8 @@ func (s *WorkspaceServiceImpl) GetAll() ([]*model.Workspace, error) {
 	for i, container := range containers {
 		c := model.NewContainerFromContainer(&container)
 		workspaces[i] = &model.Workspace{
-			ID:    c.Name,
-			RDBMS: c.Image,
+			ID: c.Name,
+			DB: c.Image,
 		}
 	}
 
@@ -56,8 +56,8 @@ func (s *WorkspaceServiceImpl) Get(id string) (*model.Workspace, error) {
 
 	c := model.NewContainerFromContainerJSON(cj)
 	return &model.Workspace{
-		ID:    c.Name,
-		RDBMS: c.Image,
+		ID: c.Name,
+		DB: c.Image,
 	}, nil
 }
 
@@ -71,8 +71,8 @@ func (s *WorkspaceServiceImpl) Create(db string) (*model.Workspace, error) {
 
 	c := model.NewContainerFromContainerJSON(cj)
 	p := &model.Workspace{
-		ID:    c.Name,
-		RDBMS: c.Image,
+		ID: c.Name,
+		DB: c.Image,
 	}
 
 	return p, nil
@@ -82,7 +82,7 @@ func (s *WorkspaceServiceImpl) Delete(id string) error {
 	return s.containerRepository.Delete(id)
 }
 
-func (s *WorkspaceServiceImpl) Execute(id string, query string) (*model.ExecuteResult, error) {
+func (s *WorkspaceServiceImpl) Execute(id string, query string) (*model.QueryResult, error) {
 	cj, err := s.containerRepository.Get(id)
 	if err != nil {
 		return nil, err
