@@ -38,86 +38,86 @@ func NewWorkspacesHandler(service service.WorkspaceService) WorkspacesHandler {
 }
 
 // GET /workspaces
-func (h *WorkspacesHandlerImpl) Index(c echo.Context) error {
+func (h *WorkspacesHandlerImpl) Index(ctx echo.Context) error {
 	ps, err := h.workspaceService.GetAll()
 	if err != nil {
-		c.Logger().Error(err)
+		ctx.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}
-		return c.JSON(http.StatusInternalServerError, res)
+		return ctx.JSON(http.StatusInternalServerError, res)
 	}
 
-	return c.JSON(http.StatusOK, ps)
+	return ctx.JSON(http.StatusOK, ps)
 }
 
 // GET /workspaces/:id
-func (h *WorkspacesHandlerImpl) Show(c echo.Context) error {
-	id := c.Param("id")
+func (h *WorkspacesHandlerImpl) Show(ctx echo.Context) error {
+	id := ctx.Param("id")
 	p, err := h.workspaceService.Get(id)
 	if err != nil {
-		c.Logger().Error(err)
+		ctx.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}
-		return c.JSON(http.StatusInternalServerError, res)
+		return ctx.JSON(http.StatusInternalServerError, res)
 	}
 
-	return c.JSON(http.StatusOK, p)
+	return ctx.JSON(http.StatusOK, p)
 }
 
 // POST /workspaces
-func (h *WorkspacesHandlerImpl) Create(c echo.Context) error {
+func (h *WorkspacesHandlerImpl) Create(ctx echo.Context) error {
 	type Create struct {
 		Db string `json:"db"`
 	}
 
 	var create Create
-	if err := c.Bind(&create); err != nil {
-		c.Logger().Error(err)
+	if err := ctx.Bind(&create); err != nil {
+		ctx.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}
-		return c.JSON(http.StatusInternalServerError, res)
+		return ctx.JSON(http.StatusInternalServerError, res)
 	}
 
 	p, err := h.workspaceService.Create(create.Db)
 	if err != nil {
-		c.Logger().Error(err)
+		ctx.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}
-		return c.JSON(http.StatusInternalServerError, res)
+		return ctx.JSON(http.StatusInternalServerError, res)
 	}
 
-	return c.JSON(http.StatusOK, p)
+	return ctx.JSON(http.StatusOK, p)
 }
 
 // DELETE /workspaces/:id
-func (h *WorkspacesHandlerImpl) Delete(c echo.Context) error {
-	id := c.Param("id")
+func (h *WorkspacesHandlerImpl) Delete(ctx echo.Context) error {
+	id := ctx.Param("id")
 	if err := h.workspaceService.Delete(id); err != nil {
-		c.Logger().Error(err)
+		ctx.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}
-		return c.JSON(http.StatusInternalServerError, res)
+		return ctx.JSON(http.StatusInternalServerError, res)
 	}
 
-	return c.NoContent(http.StatusNoContent)
+	return ctx.NoContent(http.StatusNoContent)
 }
 
 // POST /workspaces/:id/query
-func (h *WorkspacesHandlerImpl) Query(c echo.Context) error {
-	id := c.Param("id")
+func (h *WorkspacesHandlerImpl) Query(ctx echo.Context) error {
+	id := ctx.Param("id")
 
 	type Query struct {
 		Query string `json:"query"`
 	}
 
 	var q Query
-	if err := c.Bind(&q); err != nil {
-		c.Logger().Error(err)
+	if err := ctx.Bind(&q); err != nil {
+		ctx.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}
-		return c.JSON(http.StatusInternalServerError, res)
+		return ctx.JSON(http.StatusInternalServerError, res)
 	}
 
 	r, err := h.workspaceService.Execute(id, q.Query)
 	if err != nil {
-		c.Logger().Error(err)
+		ctx.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}
-		return c.JSON(http.StatusInternalServerError, res)
+		return ctx.JSON(http.StatusInternalServerError, res)
 	}
 
-	return c.JSON(http.StatusOK, r)
+	return ctx.JSON(http.StatusOK, r)
 }
