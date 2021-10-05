@@ -22,7 +22,7 @@ func NewRDBMSRepository() RDBMSRepository {
 	return &RDBMSRepositoryImpl{}
 }
 
-func (dr RDBMSRepositoryImpl) Execute(c *types.ContainerJSON, query string) (*model.QueryResult, error) {
+func (r RDBMSRepositoryImpl) Execute(c *types.ContainerJSON, query string) (*model.QueryResult, error) {
 	driverName, err := driverName(c.Config.Image)
 	if err != nil {
 		return nil, err
