@@ -29,7 +29,7 @@ func main() {
 	// Services
 	playgroundService := service.NewWorkspaceService(containerRepository, rdbmsRepository)
 
-	// Handers
+	// Handlers
 	playgroundHandler := handler.NewWorkspacesHandler(playgroundService)
 
 	// Routes
