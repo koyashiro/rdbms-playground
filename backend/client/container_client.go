@@ -21,7 +21,7 @@ type ContainerClient interface {
 	Delete(id string) error
 }
 
-type ContainerClientImpl struct {
+type containerClient struct {
 	ctx        context.Context
 	client     *client.Client
 	sync.Mutex //TODO narrow the lock range
@@ -38,10 +38,10 @@ func NewContainerClient() ContainerClient {
 		panic(err)
 	}
 
-	return &ContainerClientImpl{ctx: ctx, client: c}
+	return &containerClient{ctx: ctx, client: c}
 }
 
-func (r *ContainerClientImpl) GetAll() ([]types.Container, error) {
+func (r *containerClient) GetAll() ([]types.Container, error) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -56,14 +56,14 @@ func (r *ContainerClientImpl) GetAll() ([]types.Container, error) {
 	return cl, nil
 }
 
-func (r *ContainerClientImpl) Get(id string) (*types.ContainerJSON, error) {
+func (r *containerClient) Get(id string) (*types.ContainerJSON, error) {
 	r.Lock()
 	defer r.Unlock()
 
 	return r.get(id)
 }
 
-func (r *ContainerClientImpl) Create(workspaceID string, db string) (*types.ContainerJSON, error) {
+func (r *containerClient) Create(workspaceID string, db string) (*types.ContainerJSON, error) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -97,7 +97,7 @@ func (r *ContainerClientImpl) Create(workspaceID string, db string) (*types.Cont
 	return c, nil
 }
 
-func (r *ContainerClientImpl) Delete(id string) error {
+func (r *containerClient) Delete(id string) error {
 	r.Lock()
 	defer r.Unlock()
 
@@ -113,7 +113,7 @@ func (r *ContainerClientImpl) Delete(id string) error {
 	})
 }
 
-func (r *ContainerClientImpl) get(id string) (*types.ContainerJSON, error) {
+func (r *containerClient) get(id string) (*types.ContainerJSON, error) {
 	c, err := r.client.ContainerInspect(r.ctx, id)
 	if err != nil {
 		return nil, err

@@ -29,16 +29,16 @@ type WorkspacesHandler interface {
 	Query(c echo.Context) error
 }
 
-type WorkspacesHandlerImpl struct {
+type workspaceHandler struct {
 	workspaceService service.WorkspaceService
 }
 
 func NewWorkspacesHandler(service service.WorkspaceService) WorkspacesHandler {
-	return &WorkspacesHandlerImpl{workspaceService: service}
+	return &workspaceHandler{workspaceService: service}
 }
 
 // GET /workspaces
-func (h *WorkspacesHandlerImpl) Index(ctx echo.Context) error {
+func (h *workspaceHandler) Index(ctx echo.Context) error {
 	ps, err := h.workspaceService.GetAll()
 	if err != nil {
 		ctx.Logger().Error(err)
@@ -50,7 +50,7 @@ func (h *WorkspacesHandlerImpl) Index(ctx echo.Context) error {
 }
 
 // GET /workspaces/:id
-func (h *WorkspacesHandlerImpl) Show(ctx echo.Context) error {
+func (h *workspaceHandler) Show(ctx echo.Context) error {
 	id := ctx.Param("id")
 	p, err := h.workspaceService.Get(id)
 	if err != nil {
@@ -63,7 +63,7 @@ func (h *WorkspacesHandlerImpl) Show(ctx echo.Context) error {
 }
 
 // POST /workspaces
-func (h *WorkspacesHandlerImpl) Create(ctx echo.Context) error {
+func (h *workspaceHandler) Create(ctx echo.Context) error {
 	type Create struct {
 		Db string `json:"db"`
 	}
@@ -86,7 +86,7 @@ func (h *WorkspacesHandlerImpl) Create(ctx echo.Context) error {
 }
 
 // DELETE /workspaces/:id
-func (h *WorkspacesHandlerImpl) Delete(ctx echo.Context) error {
+func (h *workspaceHandler) Delete(ctx echo.Context) error {
 	id := ctx.Param("id")
 	if err := h.workspaceService.Delete(id); err != nil {
 		ctx.Logger().Error(err)
@@ -98,7 +98,7 @@ func (h *WorkspacesHandlerImpl) Delete(ctx echo.Context) error {
 }
 
 // POST /workspaces/:id/query
-func (h *WorkspacesHandlerImpl) Query(ctx echo.Context) error {
+func (h *workspaceHandler) Query(ctx echo.Context) error {
 	id := ctx.Param("id")
 
 	type Query struct {

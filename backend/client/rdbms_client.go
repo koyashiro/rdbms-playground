@@ -16,13 +16,13 @@ type RDBMSClient interface {
 	Execute(c *types.ContainerJSON, query string) (*model.QueryResult, error)
 }
 
-type RDBMSClientImpl struct{}
+type rdbmsClient struct{}
 
 func NewRDBMSClient() RDBMSClient {
-	return &RDBMSClientImpl{}
+	return &rdbmsClient{}
 }
 
-func (r RDBMSClientImpl) Execute(c *types.ContainerJSON, query string) (*model.QueryResult, error) {
+func (r rdbmsClient) Execute(c *types.ContainerJSON, query string) (*model.QueryResult, error) {
 	driverName, err := driverName(c.Config.Image)
 	if err != nil {
 		return nil, err

@@ -15,7 +15,7 @@ type WorkspaceService interface {
 	Execute(id string, query string) (*model.QueryResult, error)
 }
 
-type WorkspaceServiceImpl struct {
+type workspaceService struct {
 	containerClient client.ContainerClient
 	rdbmsClient     client.RDBMSClient
 }
@@ -24,13 +24,13 @@ func NewWorkspaceService(
 	containerClient client.ContainerClient,
 	rdbmsClient client.RDBMSClient,
 ) WorkspaceService {
-	return &WorkspaceServiceImpl{
+	return &workspaceService{
 		containerClient: containerClient,
 		rdbmsClient:     rdbmsClient,
 	}
 }
 
-func (s *WorkspaceServiceImpl) GetAll() ([]*model.Workspace, error) {
+func (s *workspaceService) GetAll() ([]*model.Workspace, error) {
 	containers, err := s.containerClient.GetAll()
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func (s *WorkspaceServiceImpl) GetAll() ([]*model.Workspace, error) {
 	return workspaces, nil
 }
 
-func (s *WorkspaceServiceImpl) Get(id string) (*model.Workspace, error) {
+func (s *workspaceService) Get(id string) (*model.Workspace, error) {
 	cj, err := s.containerClient.Get(id)
 	if err != nil {
 		return nil, err
@@ -61,7 +61,7 @@ func (s *WorkspaceServiceImpl) Get(id string) (*model.Workspace, error) {
 	}, nil
 }
 
-func (s *WorkspaceServiceImpl) Create(db string) (*model.Workspace, error) {
+func (s *workspaceService) Create(db string) (*model.Workspace, error) {
 	id := uuid.New().String()
 
 	cj, err := s.containerClient.Create(id, db)
@@ -78,11 +78,11 @@ func (s *WorkspaceServiceImpl) Create(db string) (*model.Workspace, error) {
 	return p, nil
 }
 
-func (s *WorkspaceServiceImpl) Delete(id string) error {
+func (s *workspaceService) Delete(id string) error {
 	return s.containerClient.Delete(id)
 }
 
-func (s *WorkspaceServiceImpl) Execute(id string, query string) (*model.QueryResult, error) {
+func (s *workspaceService) Execute(id string, query string) (*model.QueryResult, error) {
 	cj, err := s.containerClient.Get(id)
 	if err != nil {
 		return nil, err
