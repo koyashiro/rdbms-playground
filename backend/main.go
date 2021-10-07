@@ -4,8 +4,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
+	"github.com/koyashiro/rdbms-playground/backend/client"
 	"github.com/koyashiro/rdbms-playground/backend/handler"
-	"github.com/koyashiro/rdbms-playground/backend/repository"
 	"github.com/koyashiro/rdbms-playground/backend/service"
 )
 
@@ -22,12 +22,12 @@ func main() {
 
 	// TODO: replace DI
 
-	// Repositories
-	containerRepository := repository.NewContainerRepository()
-	rdbmsRepository := repository.NewRDBMSRepository()
+	// Clients
+	containerClient := client.NewContainerClient()
+	rdbmsClient := client.NewRDBMSClient()
 
 	// Services
-	playgroundService := service.NewWorkspaceService(containerRepository, rdbmsRepository)
+	playgroundService := service.NewWorkspaceService(containerClient, rdbmsClient)
 
 	// Handlers
 	playgroundHandler := handler.NewWorkspacesHandler(playgroundService)

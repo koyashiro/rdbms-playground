@@ -1,4 +1,4 @@
-package repository
+package client
 
 import (
 	"database/sql"
@@ -12,17 +12,17 @@ import (
 	"github.com/koyashiro/rdbms-playground/backend/model"
 )
 
-type RDBMSRepository interface {
+type RDBMSClient interface {
 	Execute(c *types.ContainerJSON, query string) (*model.QueryResult, error)
 }
 
-type RDBMSRepositoryImpl struct{}
+type RDBMSClientImpl struct{}
 
-func NewRDBMSRepository() RDBMSRepository {
-	return &RDBMSRepositoryImpl{}
+func NewRDBMSClient() RDBMSClient {
+	return &RDBMSClientImpl{}
 }
 
-func (r RDBMSRepositoryImpl) Execute(c *types.ContainerJSON, query string) (*model.QueryResult, error) {
+func (r RDBMSClientImpl) Execute(c *types.ContainerJSON, query string) (*model.QueryResult, error) {
 	driverName, err := driverName(c.Config.Image)
 	if err != nil {
 		return nil, err

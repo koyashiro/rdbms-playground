@@ -3,8 +3,8 @@ package service
 import (
 	"github.com/google/uuid"
 
+	"github.com/koyashiro/rdbms-playground/backend/client"
 	"github.com/koyashiro/rdbms-playground/backend/model"
-	"github.com/koyashiro/rdbms-playground/backend/repository"
 )
 
 type WorkspaceService interface {
@@ -16,22 +16,22 @@ type WorkspaceService interface {
 }
 
 type WorkspaceServiceImpl struct {
-	containerRepository repository.ContainerRepository
-	rdbmsRepository     repository.RDBMSRepository
+	containerClient client.ContainerClient
+	rdbmsClient     client.RDBMSClient
 }
 
 func NewWorkspaceService(
-	containerRepository repository.ContainerRepository,
-	rdbmsRepository repository.RDBMSRepository,
+	containerClient client.ContainerClient,
+	rdbmsClient client.RDBMSClient,
 ) WorkspaceService {
 	return &WorkspaceServiceImpl{
-		containerRepository: containerRepository,
-		rdbmsRepository:     rdbmsRepository,
+		containerClient: containerClient,
+		rdbmsClient:     rdbmsClient,
 	}
 }
 
 func (s *WorkspaceServiceImpl) GetAll() ([]*model.Workspace, error) {
-	containers, err := s.containerRepository.GetAll()
+	containers, err := s.containerClient.GetAll()
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (s *WorkspaceServiceImpl) GetAll() ([]*model.Workspace, error) {
 }
 
 func (s *WorkspaceServiceImpl) Get(id string) (*model.Workspace, error) {
-	cj, err := s.containerRepository.Get(id)
+	cj, err := s.containerClient.Get(id)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (s *WorkspaceServiceImpl) Get(id string) (*model.Workspace, error) {
 func (s *WorkspaceServiceImpl) Create(db string) (*model.Workspace, error) {
 	id := uuid.New().String()
 
-	cj, err := s.containerRepository.Create(id, db)
+	cj, err := s.containerClient.Create(id, db)
 	if err != nil {
 		return nil, err
 	}
@@ -79,16 +79,16 @@ func (s *WorkspaceServiceImpl) Create(db string) (*model.Workspace, error) {
 }
 
 func (s *WorkspaceServiceImpl) Delete(id string) error {
-	return s.containerRepository.Delete(id)
+	return s.containerClient.Delete(id)
 }
 
 func (s *WorkspaceServiceImpl) Execute(id string, query string) (*model.QueryResult, error) {
-	cj, err := s.containerRepository.Get(id)
+	cj, err := s.containerClient.Get(id)
 	if err != nil {
 		return nil, err
 	}
 
-	r, err := s.rdbmsRepository.Execute(cj, query)
+	r, err := s.rdbmsClient.Execute(cj, query)
 	if err != nil {
 		return nil, err
 	}
