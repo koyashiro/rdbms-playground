@@ -5,6 +5,6 @@ services:
     image: docker
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    command: sh -c 'docker container ls --filter label=type=playground -q | xargs --no-run-if-empty docker rm --force'
+    command: sh -c 'docker container ls --filter label=type=playground -q | xargs --no-run-if-empty docker stop'
     profiles:
       - clean

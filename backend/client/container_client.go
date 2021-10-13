@@ -73,7 +73,8 @@ func (r *containerClient) Create(workspaceID string, db string) (*types.Containe
 	}
 
 	rhc := &container.HostConfig{
-		CapDrop: []string{"fsetid", "kill", "setpcap", "net_raw", "sys_chroot", "mknod", "audit_write", "setfcap"},
+		AutoRemove: true,
+		CapDrop:    []string{"fsetid", "kill", "setpcap", "net_raw", "sys_chroot", "mknod", "audit_write", "setfcap"},
 	}
 	ccb, err := r.client.ContainerCreate(r.ctx, config, rhc, nil, nil, workspaceID)
 	if err != nil {
