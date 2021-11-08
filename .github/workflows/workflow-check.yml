@@ -15,14 +15,8 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-    - name: Check out the repo
-      uses: actions/checkout@v2
+      - name: Check out the repo
+        uses: actions/checkout@v2
 
-    - name: Download actionlint
-      id: get_actionlint
-      run: bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
-      shell: bash
-
-    - name: Check workflow files
-      run: ${{ steps.get_actionlint.outputs.executable }} -color
-      shell: bash
+      - name: Run actionlint
+        uses: reviewdog/action-actionlint@v1
