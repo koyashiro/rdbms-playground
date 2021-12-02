@@ -1,4 +1,4 @@
-FROM node:16.13.0 as development
+FROM node:16.13.1 as development
 WORKDIR /app
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
@@ -9,7 +9,7 @@ FROM development as build
 RUN yarn build
 RUN yarn install --production --frozen-lockfile
 
-FROM node:16.13.0-slim as production
+FROM node:16.13.1-slim as production
 WORKDIR /app
 COPY --from=build /app/package.json /app/package.json
 COPY --from=build /app/yarn.lock /app/yarn.lock
