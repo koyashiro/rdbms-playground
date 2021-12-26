@@ -17,31 +17,31 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     steps:
-    - name: Check out the repo
-      uses: actions/checkout@v2
+      - name: Check out the repo
+        uses: actions/checkout@v2
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: 16.13.1
-        cache: yarn
-        cache-dependency-path: ./frontend/yarn.lock
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.13.1
+          cache: yarn
+          cache-dependency-path: ./frontend/yarn.lock
 
-    - name: Install dependencies
-      working-directory: ./frontend
-      run: yarn install --frozen-lockfile
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: yarn install --frozen-lockfile
 
-    - name: Check format
-      working-directory: ./frontend
-      run: yarn fmt:check
+      - name: Check format
+        working-directory: ./frontend
+        run: yarn fmt:check
 
-    - name: Lint
-      working-directory: ./frontend
-      run: yarn lint
+      - name: Lint
+        working-directory: ./frontend
+        run: yarn lint
 
-    - name: Build
-      working-directory: ./frontend
-      run: yarn build
+      - name: Build
+        working-directory: ./frontend
+        run: yarn build
 
   push_to_registry:
     name: Build and Publish Docker image to GitHub Packages
