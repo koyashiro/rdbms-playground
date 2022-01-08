@@ -1,4 +1,4 @@
-FROM golang:1.17.5 as development
+FROM golang:1.17.6 as development
 WORKDIR /go/src/github.com/koyashiro/rdbms-playground
 COPY go.mod go.sum ./
 RUN go mod download
