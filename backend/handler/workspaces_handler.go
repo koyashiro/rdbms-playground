@@ -5,7 +5,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/koyashiro/postgres-playground/backend/service"
+	"github.com/koyashiro/rdbms-playground/backend/service"
 )
 
 type ErrorResponse struct {
@@ -13,97 +13,111 @@ type ErrorResponse struct {
 }
 
 type WorkspacesHandler interface {
-	GetWorkspaces(c echo.Context) error
-	GetWorkspace(c echo.Context) error
-	PostWorkspace(c echo.Context) error
-	DeleteWorkspace(c echo.Context) error
-	ExecuteQuery(c echo.Context) error
+	// GET /workspaces
+	Index(c echo.Context) error
+
+	// GET /workspaces/:id
+	Show(c echo.Context) error
+
+	// POST /workspaces
+	Create(c echo.Context) error
+
+	// DELETE /workspaces/:id
+	Delete(c echo.Context) error
+
+	// POST /workspaces/:id/query
+	Query(c echo.Context) error
 }
 
-type WorkspacesHandlerImpl struct {
+type workspaceHandler struct {
 	workspaceService service.WorkspaceService
 }
 
 func NewWorkspacesHandler(service service.WorkspaceService) WorkspacesHandler {
-	return &WorkspacesHandlerImpl{workspaceService: service}
+	return &workspaceHandler{workspaceService: service}
 }
 
-func (h *WorkspacesHandlerImpl) GetWorkspaces(c echo.Context) error {
+// GET /workspaces
+func (h *workspaceHandler) Index(ctx echo.Context) error {
 	ps, err := h.workspaceService.GetAll()
 	if err != nil {
-		c.Logger().Error(err)
+		ctx.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}
-		return c.JSON(http.StatusInternalServerError, res)
+		return ctx.JSON(http.StatusInternalServerError, res)
 	}
 
-	return c.JSON(http.StatusOK, ps)
+	return ctx.JSON(http.StatusOK, ps)
 }
 
-func (h *WorkspacesHandlerImpl) GetWorkspace(c echo.Context) error {
-	id := c.Param("id")
+// GET /workspaces/:id
+func (h *workspaceHandler) Show(ctx echo.Context) error {
+	id := ctx.Param("id")
 	p, err := h.workspaceService.Get(id)
 	if err != nil {
-		c.Logger().Error(err)
+		ctx.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}
-		return c.JSON(http.StatusInternalServerError, res)
+		return ctx.JSON(http.StatusInternalServerError, res)
 	}
 
-	return c.JSON(http.StatusOK, p)
+	return ctx.JSON(http.StatusOK, p)
 }
 
-func (h *WorkspacesHandlerImpl) PostWorkspace(c echo.Context) error {
+// POST /workspaces
+func (h *workspaceHandler) Create(ctx echo.Context) error {
 	type Create struct {
 		Db string `json:"db"`
 	}
 
 	var create Create
-	if err := c.Bind(&create); err != nil {
-		c.Logger().Error(err)
+	if err := ctx.Bind(&create); err != nil {
+		ctx.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}
-		return c.JSON(http.StatusInternalServerError, res)
+		return ctx.JSON(http.StatusInternalServerError, res)
 	}
 
 	p, err := h.workspaceService.Create(create.Db)
 	if err != nil {
-		c.Logger().Error(err)
+		ctx.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}
-		return c.JSON(http.StatusInternalServerError, res)
+		return ctx.JSON(http.StatusInternalServerError, res)
 	}
 
-	return c.JSON(http.StatusOK, p)
+	return ctx.JSON(http.StatusOK, p)
 }
 
-func (h *WorkspacesHandlerImpl) DeleteWorkspace(c echo.Context) error {
-	id := c.Param("id")
-	if err := h.workspaceService.Destroy(id); err != nil {
-		c.Logger().Error(err)
+// DELETE /workspaces/:id
+func (h *workspaceHandler) Delete(ctx echo.Context) error {
+	id := ctx.Param("id")
+	if err := h.workspaceService.Delete(id); err != nil {
+		ctx.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}
-		return c.JSON(http.StatusInternalServerError, res)
+		return ctx.JSON(http.StatusInternalServerError, res)
 	}
 
-	return c.NoContent(http.StatusNoContent)
+	return ctx.NoContent(http.StatusNoContent)
 }
 
-func (h *WorkspacesHandlerImpl) ExecuteQuery(c echo.Context) error {
-	id := c.Param("id")
+// POST /workspaces/:id/query
+func (h *workspaceHandler) Query(ctx echo.Context) error {
+	id := ctx.Param("id")
 
 	type Query struct {
 		Query string `json:"query"`
 	}
 
 	var q Query
-	if err := c.Bind(&q); err != nil {
-		c.Logger().Error(err)
+	if err := ctx.Bind(&q); err != nil {
+		ctx.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}
-		return c.JSON(http.StatusInternalServerError, res)
+		return ctx.JSON(http.StatusInternalServerError, res)
 	}
 
 	r, err := h.workspaceService.Execute(id, q.Query)
 	if err != nil {
-		c.Logger().Error(err)
+		ctx.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}
-		return c.JSON(http.StatusInternalServerError, res)
+		return ctx.JSON(http.StatusInternalServerError, res)
 	}
 
-	return c.JSON(http.StatusOK, r)
+	return ctx.JSON(http.StatusOK, r)
 }

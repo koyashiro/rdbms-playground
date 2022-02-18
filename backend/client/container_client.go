@@ -1,4 +1,4 @@
-package repository
+package client
 
 import (
 	"context"
@@ -11,23 +11,23 @@ import (
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
 
-	"github.com/koyashiro/postgres-playground/backend/env"
+	"github.com/koyashiro/rdbms-playground/backend/env"
 )
 
-type ContainerRepository interface {
+type ContainerClient interface {
 	GetAll() ([]types.Container, error)
 	Get(id string) (*types.ContainerJSON, error)
 	Create(name string, db string) (*types.ContainerJSON, error)
 	Delete(id string) error
 }
 
-type ContainerRepositoryImpl struct {
+type containerClient struct {
 	ctx        context.Context
 	client     *client.Client
 	sync.Mutex //TODO narrow the lock range
 }
 
-func NewContainerRepository() (ContainerRepository, error) {
+func NewContainerClient() ContainerClient {
 	ctx := context.Background()
 	c, err := client.NewClientWithOpts(
 		client.WithHost(client.DefaultDockerHost),
@@ -35,41 +35,58 @@ func NewContainerRepository() (ContainerRepository, error) {
 	)
 
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
-	return &ContainerRepositoryImpl{ctx: ctx, client: c}, nil
+	return &containerClient{ctx: ctx, client: c}
 }
 
-func (r *ContainerRepositoryImpl) GetAll() ([]types.Container, error) {
+func (r *containerClient) GetAll() ([]types.Container, error) {
 	r.Lock()
 	defer r.Unlock()
 
-	return r.getAll()
+	clo := types.ContainerListOptions{
+		Filters: filters.NewArgs(filters.Arg("label", "type=playground")),
+	}
+	cl, err := r.client.ContainerList(r.ctx, clo)
+	if err != nil {
+		return nil, err
+	}
+
+	return cl, nil
 }
 
-func (r *ContainerRepositoryImpl) Get(id string) (*types.ContainerJSON, error) {
+func (r *containerClient) Get(id string) (*types.ContainerJSON, error) {
 	r.Lock()
 	defer r.Unlock()
 
 	return r.get(id)
 }
 
-func (r *ContainerRepositoryImpl) Create(workspaceID string, db string) (*types.ContainerJSON, error) {
+func (r *containerClient) Create(workspaceID string, db string) (*types.ContainerJSON, error) {
 	r.Lock()
 	defer r.Unlock()
 
-	ccb, err := r.create(workspaceID, db)
+	config, err := config(workspaceID, db)
 	if err != nil {
 		return nil, err
 	}
 
-	err = r.start(ccb.ID)
+	rhc := &container.HostConfig{
+		AutoRemove: true,
+		CapDrop:    []string{"fsetid", "kill", "setpcap", "net_raw", "sys_chroot", "mknod", "audit_write", "setfcap"},
+	}
+	ccb, err := r.client.ContainerCreate(r.ctx, config, rhc, nil, nil, workspaceID)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := r.client.NetworkConnect(r.ctx, env.Network, ccb.ID, nil); err != nil {
+	if err := r.client.ContainerStart(r.ctx, ccb.ID, types.ContainerStartOptions{}); err != nil {
+		return nil, err
+	}
+
+	err = r.client.NetworkConnect(r.ctx, env.Network, ccb.ID, nil)
+	if err != nil {
 		return nil, err
 	}
 
@@ -81,7 +98,7 @@ func (r *ContainerRepositoryImpl) Create(workspaceID string, db string) (*types.
 	return c, nil
 }
 
-func (r *ContainerRepositoryImpl) Delete(id string) error {
+func (r *containerClient) Delete(id string) error {
 	r.Lock()
 	defer r.Unlock()
 
@@ -97,19 +114,7 @@ func (r *ContainerRepositoryImpl) Delete(id string) error {
 	})
 }
 
-func (r *ContainerRepositoryImpl) getAll() ([]types.Container, error) {
-	clo := types.ContainerListOptions{
-		Filters: filters.NewArgs(filters.Arg("label", "type=playground")),
-	}
-	cl, err := r.client.ContainerList(r.ctx, clo)
-	if err != nil {
-		return nil, err
-	}
-
-	return cl, nil
-}
-
-func (r *ContainerRepositoryImpl) get(id string) (*types.ContainerJSON, error) {
+func (r *containerClient) get(id string) (*types.ContainerJSON, error) {
 	c, err := r.client.ContainerInspect(r.ctx, id)
 	if err != nil {
 		return nil, err
@@ -141,6 +146,15 @@ func config(workspaceID string, db string) (*container.Config, error) {
 			},
 			Env: []string{"MYSQL_ROOT_PASSWORD=" + password},
 		}, nil
+	case "mariadb":
+		return &container.Config{
+			Image: "mariadb",
+			Labels: map[string]string{
+				"type": "playground",
+				"wid":  workspaceID,
+			},
+			Env: []string{"MARIADB_ROOT_PASSWORD=" + password},
+		}, nil
 	case "postgres":
 		return &container.Config{
 			Image: "postgres",
@@ -153,17 +167,4 @@ func config(workspaceID string, db string) (*container.Config, error) {
 	default:
 		return nil, errors.New("invalid db")
 	}
-}
-
-func (r *ContainerRepositoryImpl) create(workspaceID string, db string) (container.ContainerCreateCreatedBody, error) {
-	c, err := config(workspaceID, db)
-	if err != nil {
-		return container.ContainerCreateCreatedBody{}, err
-	}
-
-	return r.client.ContainerCreate(r.ctx, c, restrictHostConfig, nil, nil, workspaceID)
-}
-
-func (r *ContainerRepositoryImpl) start(id string) error {
-	return r.client.ContainerStart(r.ctx, id, types.ContainerStartOptions{})
 }

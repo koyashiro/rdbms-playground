@@ -4,8 +4,8 @@ import (
 	"database/sql"
 )
 
-type ExecuteResult struct {
-	Columns []*Column       `json:"columns"`
+type QueryResult struct {
+	Columns []Column        `json:"columns"`
 	Rows    [][]interface{} `json:"rows"`
 }
 

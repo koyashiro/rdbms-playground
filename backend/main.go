@@ -4,9 +4,9 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	"github.com/koyashiro/postgres-playground/backend/handler"
-	"github.com/koyashiro/postgres-playground/backend/repository"
-	"github.com/koyashiro/postgres-playground/backend/service"
+	"github.com/koyashiro/rdbms-playground/backend/client"
+	"github.com/koyashiro/rdbms-playground/backend/handler"
+	"github.com/koyashiro/rdbms-playground/backend/service"
 )
 
 const port = "1323"
@@ -21,20 +21,23 @@ func main() {
 	e.Use(middleware.CORS())
 
 	// TODO: replace DI
-	cr, err := repository.NewContainerRepository()
-	if err != nil {
-		panic(err)
-	}
-	rr := repository.NewRDBMSRepository()
-	ps := service.NewWorkspaceService(cr, rr)
-	ph := handler.NewWorkspacesHandler(ps)
+
+	// Clients
+	containerClient := client.NewContainerClient()
+	rdbmsClient := client.NewRDBMSClient()
+
+	// Services
+	playgroundService := service.NewWorkspaceService(containerClient, rdbmsClient)
+
+	// Handlers
+	playgroundHandler := handler.NewWorkspacesHandler(playgroundService)
 
 	// Routes
-	e.GET("/workspaces", ph.GetWorkspaces)
-	e.GET("/workspaces/:id", ph.GetWorkspace)
-	e.POST("/workspaces", ph.PostWorkspace)
-	e.DELETE("/workspaces/:id", ph.DeleteWorkspace)
-	e.POST("/workspaces/:id/query", ph.ExecuteQuery)
+	e.GET("/workspaces", playgroundHandler.Index)
+	e.GET("/workspaces/:id", playgroundHandler.Show)
+	e.POST("/workspaces", playgroundHandler.Create)
+	e.DELETE("/workspaces/:id", playgroundHandler.Delete)
+	e.POST("/workspaces/:id/query", playgroundHandler.Query)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":" + port))
