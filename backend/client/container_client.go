@@ -3,6 +3,8 @@ package client
 import (
 	"context"
 	"errors"
+	"io"
+	"os"
 	"sync"
 	"time"
 
@@ -63,6 +65,8 @@ func (r *containerClient) Get(id string) (*types.ContainerJSON, error) {
 	return r.get(id)
 }
 
+var limitsProcess = int64(50)
+
 func (r *containerClient) Create(workspaceID string, db string) (*types.ContainerJSON, error) {
 	r.Lock()
 	defer r.Unlock()
@@ -75,7 +79,22 @@ func (r *containerClient) Create(workspaceID string, db string) (*types.Containe
 	rhc := &container.HostConfig{
 		AutoRemove: true,
 		CapDrop:    []string{"fsetid", "kill", "setpcap", "net_raw", "sys_chroot", "mknod", "audit_write", "setfcap"},
+		Resources: container.Resources{
+			CPUQuota:  10000,
+			CPUPeriod: 5000,
+			Memory:    209_715_200,
+			PidsLimit: &limitsProcess,
+		},
 	}
+
+	reader, err := r.client.ImagePull(r.ctx, "docker.io/library/"+config.Image, types.ImagePullOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	defer reader.Close()
+	io.Copy(os.Stdout, reader)
+
 	ccb, err := r.client.ContainerCreate(r.ctx, config, rhc, nil, nil, workspaceID)
 	if err != nil {
 		return nil, err
@@ -121,17 +140,6 @@ func (r *containerClient) get(id string) (*types.ContainerJSON, error) {
 	}
 
 	return &c, nil
-}
-
-var limitsProcess = int64(50)
-var restrictHostConfig = &container.HostConfig{
-	CapDrop: []string{"fsetid", "kill", "setpcap", "net_raw", "sys_chroot", "mknod", "audit_write", "setfcap"},
-	Resources: container.Resources{
-		CPUQuota:  10000,
-		CPUPeriod: 5000,
-		Memory:    209_715_200,
-		PidsLimit: &limitsProcess,
-	},
 }
 
 func config(workspaceID string, db string) (*container.Config, error) {
