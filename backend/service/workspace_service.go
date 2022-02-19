@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"github.com/google/uuid"
 
 	"github.com/koyashiro/rdbms-playground/backend/client"
@@ -8,11 +9,11 @@ import (
 )
 
 type WorkspaceService interface {
-	GetAll() ([]*model.Workspace, error)
-	Get(id string) (*model.Workspace, error)
-	Create(db string) (*model.Workspace, error)
-	Delete(id string) error
-	Execute(id string, query string) (*model.QueryResult, error)
+	GetAll(ctx context.Context) ([]*model.Workspace, error)
+	Get(ctx context.Context, id string) (*model.Workspace, error)
+	Create(ctx context.Context, db string) (*model.Workspace, error)
+	Delete(ctx context.Context, id string) error
+	Execute(ctx context.Context, id string, query string) (*model.QueryResult, error)
 }
 
 type workspaceService struct {
@@ -30,8 +31,8 @@ func NewWorkspaceService(
 	}
 }
 
-func (s *workspaceService) GetAll() ([]*model.Workspace, error) {
-	containers, err := s.containerClient.GetAll()
+func (s *workspaceService) GetAll(ctx context.Context) ([]*model.Workspace, error) {
+	containers, err := s.containerClient.GetAll(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -48,8 +49,8 @@ func (s *workspaceService) GetAll() ([]*model.Workspace, error) {
 	return workspaces, nil
 }
 
-func (s *workspaceService) Get(id string) (*model.Workspace, error) {
-	cj, err := s.containerClient.Get(id)
+func (s *workspaceService) Get(ctx context.Context, id string) (*model.Workspace, error) {
+	cj, err := s.containerClient.Get(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -61,10 +62,10 @@ func (s *workspaceService) Get(id string) (*model.Workspace, error) {
 	}, nil
 }
 
-func (s *workspaceService) Create(db string) (*model.Workspace, error) {
+func (s *workspaceService) Create(ctx context.Context, db string) (*model.Workspace, error) {
 	id := uuid.New().String()
 
-	cj, err := s.containerClient.Create(id, db)
+	cj, err := s.containerClient.Create(ctx, id, db)
 	if err != nil {
 		return nil, err
 	}
@@ -78,12 +79,12 @@ func (s *workspaceService) Create(db string) (*model.Workspace, error) {
 	return p, nil
 }
 
-func (s *workspaceService) Delete(id string) error {
-	return s.containerClient.Delete(id)
+func (s *workspaceService) Delete(ctx context.Context, id string) error {
+	return s.containerClient.Delete(ctx, id)
 }
 
-func (s *workspaceService) Execute(id string, query string) (*model.QueryResult, error) {
-	cj, err := s.containerClient.Get(id)
+func (s *workspaceService) Execute(ctx context.Context, id string, query string) (*model.QueryResult, error) {
+	cj, err := s.containerClient.Get(ctx, id)
 	if err != nil {
 		return nil, err
 	}

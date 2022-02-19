@@ -39,7 +39,7 @@ func NewWorkspacesHandler(service service.WorkspaceService) WorkspacesHandler {
 
 // GET /workspaces
 func (h *workspaceHandler) Index(ctx echo.Context) error {
-	ps, err := h.workspaceService.GetAll()
+	ps, err := h.workspaceService.GetAll(ctx.Request().Context())
 	if err != nil {
 		ctx.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}
@@ -52,7 +52,7 @@ func (h *workspaceHandler) Index(ctx echo.Context) error {
 // GET /workspaces/:id
 func (h *workspaceHandler) Show(ctx echo.Context) error {
 	id := ctx.Param("id")
-	p, err := h.workspaceService.Get(id)
+	p, err := h.workspaceService.Get(ctx.Request().Context(), id)
 	if err != nil {
 		ctx.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}
@@ -75,7 +75,7 @@ func (h *workspaceHandler) Create(ctx echo.Context) error {
 		return ctx.JSON(http.StatusInternalServerError, res)
 	}
 
-	p, err := h.workspaceService.Create(create.Db)
+	p, err := h.workspaceService.Create(ctx.Request().Context(), create.Db)
 	if err != nil {
 		ctx.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}
@@ -88,7 +88,7 @@ func (h *workspaceHandler) Create(ctx echo.Context) error {
 // DELETE /workspaces/:id
 func (h *workspaceHandler) Delete(ctx echo.Context) error {
 	id := ctx.Param("id")
-	if err := h.workspaceService.Delete(id); err != nil {
+	if err := h.workspaceService.Delete(ctx.Request().Context(), id); err != nil {
 		ctx.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}
 		return ctx.JSON(http.StatusInternalServerError, res)
@@ -112,7 +112,7 @@ func (h *workspaceHandler) Query(ctx echo.Context) error {
 		return ctx.JSON(http.StatusInternalServerError, res)
 	}
 
-	r, err := h.workspaceService.Execute(id, q.Query)
+	r, err := h.workspaceService.Execute(ctx.Request().Context(), id, q.Query)
 	if err != nil {
 		ctx.Logger().Error(err)
 		res := ErrorResponse{Error: err.Error()}
