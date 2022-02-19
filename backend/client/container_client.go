@@ -17,20 +17,18 @@ import (
 )
 
 type ContainerClient interface {
-	GetAll() ([]types.Container, error)
-	Get(id string) (*types.ContainerJSON, error)
-	Create(name string, db string) (*types.ContainerJSON, error)
-	Delete(id string) error
+	GetAll(ctx context.Context) ([]types.Container, error)
+	Get(ctx context.Context, id string) (*types.ContainerJSON, error)
+	Create(ctx context.Context, name string, db string) (*types.ContainerJSON, error)
+	Delete(ctx context.Context, id string) error
 }
 
 type containerClient struct {
-	ctx        context.Context
 	client     *client.Client
 	sync.Mutex //TODO narrow the lock range
 }
 
 func NewContainerClient() ContainerClient {
-	ctx := context.Background()
 	c, err := client.NewClientWithOpts(
 		client.WithHost(client.DefaultDockerHost),
 		client.WithAPIVersionNegotiation(),
@@ -40,17 +38,17 @@ func NewContainerClient() ContainerClient {
 		panic(err)
 	}
 
-	return &containerClient{ctx: ctx, client: c}
+	return &containerClient{client: c}
 }
 
-func (r *containerClient) GetAll() ([]types.Container, error) {
+func (r *containerClient) GetAll(ctx context.Context) ([]types.Container, error) {
 	r.Lock()
 	defer r.Unlock()
 
 	clo := types.ContainerListOptions{
 		Filters: filters.NewArgs(filters.Arg("label", "type=playground")),
 	}
-	cl, err := r.client.ContainerList(r.ctx, clo)
+	cl, err := r.client.ContainerList(ctx, clo)
 	if err != nil {
 		return nil, err
 	}
@@ -58,16 +56,16 @@ func (r *containerClient) GetAll() ([]types.Container, error) {
 	return cl, nil
 }
 
-func (r *containerClient) Get(id string) (*types.ContainerJSON, error) {
+func (r *containerClient) Get(ctx context.Context, id string) (*types.ContainerJSON, error) {
 	r.Lock()
 	defer r.Unlock()
 
-	return r.get(id)
+	return r.get(ctx, id)
 }
 
 var limitsProcess = int64(50)
 
-func (r *containerClient) Create(workspaceID string, db string) (*types.ContainerJSON, error) {
+func (r *containerClient) Create(ctx context.Context, workspaceID string, db string) (*types.ContainerJSON, error) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -87,7 +85,7 @@ func (r *containerClient) Create(workspaceID string, db string) (*types.Containe
 		},
 	}
 
-	reader, err := r.client.ImagePull(r.ctx, "docker.io/library/"+config.Image, types.ImagePullOptions{})
+	reader, err := r.client.ImagePull(ctx, "docker.io/library/"+config.Image, types.ImagePullOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -95,21 +93,21 @@ func (r *containerClient) Create(workspaceID string, db string) (*types.Containe
 	defer reader.Close()
 	io.Copy(os.Stdout, reader)
 
-	ccb, err := r.client.ContainerCreate(r.ctx, config, rhc, nil, nil, workspaceID)
+	ccb, err := r.client.ContainerCreate(ctx, config, rhc, nil, nil, workspaceID)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := r.client.ContainerStart(r.ctx, ccb.ID, types.ContainerStartOptions{}); err != nil {
+	if err := r.client.ContainerStart(ctx, ccb.ID, types.ContainerStartOptions{}); err != nil {
 		return nil, err
 	}
 
-	err = r.client.NetworkConnect(r.ctx, env.Network, ccb.ID, nil)
+	err = r.client.NetworkConnect(ctx, env.Network, ccb.ID, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	c, err := r.get(ccb.ID)
+	c, err := r.get(ctx, ccb.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -117,24 +115,24 @@ func (r *containerClient) Create(workspaceID string, db string) (*types.Containe
 	return c, nil
 }
 
-func (r *containerClient) Delete(id string) error {
+func (r *containerClient) Delete(ctx context.Context, id string) error {
 	r.Lock()
 	defer r.Unlock()
 
 	t := time.Second
-	if err := r.client.ContainerStop(r.ctx, id, &t); err != nil {
+	if err := r.client.ContainerStop(ctx, id, &t); err != nil {
 		return err
 	}
 
-	return r.client.ContainerRemove(r.ctx, id, types.ContainerRemoveOptions{
+	return r.client.ContainerRemove(ctx, id, types.ContainerRemoveOptions{
 		RemoveVolumes: false,
 		RemoveLinks:   false,
 		Force:         true,
 	})
 }
 
-func (r *containerClient) get(id string) (*types.ContainerJSON, error) {
-	c, err := r.client.ContainerInspect(r.ctx, id)
+func (r *containerClient) get(ctx context.Context, id string) (*types.ContainerJSON, error) {
+	c, err := r.client.ContainerInspect(ctx, id)
 	if err != nil {
 		return nil, err
 	}
