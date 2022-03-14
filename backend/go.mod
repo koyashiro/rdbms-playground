@@ -6,7 +6,7 @@ require (
 	github.com/docker/docker v20.10.10+incompatible
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/google/uuid v1.3.0
-	github.com/labstack/echo/v4 v4.7.0
+	github.com/labstack/echo/v4 v4.7.1
 	github.com/lib/pq v1.10.4
 )
 
