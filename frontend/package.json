@@ -11,7 +11,7 @@
     "fmt:check": "prettier --check pages components lib"
   },
   "dependencies": {
-    "next": "12.1.1",
+    "next": "12.1.2",
     "react": "17.0.2",
     "react-dom": "17.0.2"
   },
@@ -22,7 +22,7 @@
     "@typescript-eslint/parser": "5.16.0",
     "autoprefixer": "10.4.4",
     "eslint": "7.32.0",
-    "eslint-config-next": "12.1.1",
+    "eslint-config-next": "12.1.2",
     "eslint-config-prettier": "8.5.0",
     "postcss": "8.4.12",
     "prettier": "2.6.1",
