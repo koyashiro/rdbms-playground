@@ -1,0 +1,12 @@
+[package]
+name = "rdbms-playground"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+futures = "0.3.21"
+async-trait = "0.1.53"
+anyhow = "1.0.56"
+tokio = { version = "1.8.1", features = ["rt", "macros"] }
+http = "0.2.7"
+shiplift = "0.7"
