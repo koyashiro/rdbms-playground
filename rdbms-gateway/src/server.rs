@@ -13,8 +13,14 @@ impl From<Option<Value>> for proto::Value {
     fn from(v: Option<Value>) -> Self {
         let value = v.map(|v| match v {
             Value::Bool(b) => proto::value::Value::Bool(b),
+            Value::I8(i) => proto::value::Value::I8(i.into()),
+            Value::I16(i) => proto::value::Value::I16(i.into()),
             Value::I32(i) => proto::value::Value::I32(i),
             Value::I64(i) => proto::value::Value::I64(i),
+            Value::U8(i) => proto::value::Value::U8(i.into()),
+            Value::U16(i) => proto::value::Value::U16(i.into()),
+            Value::U32(i) => proto::value::Value::U32(i),
+            Value::U64(i) => proto::value::Value::U64(i),
             Value::F32(f) => proto::value::Value::F32(f),
             Value::F64(f) => proto::value::Value::F64(f),
             Value::String(s) => proto::value::Value::String(s),
