@@ -1,0 +1,11 @@
+[package]
+name = "mysql-gateway"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-trait = "0.1.53"
+tokio = { version = "1.18.2", features = ["macros"] }
+rdbms-gateway = { path = "../rdbms-gateway"}
+tonic = "0.7.2"
+sqlx = { version = "0.5.13", features = ["runtime-tokio-rustls", "mysql"] }
