@@ -1,0 +1,24 @@
+syntax = "proto3";
+package rdbms_gateway;
+
+service RdbmsGatewayService {
+  rpc Execute(ExecuteRequest) returns (ExecuteResponse);
+}
+
+message ExecuteRequest { string query = 1; }
+
+message ExecuteResponse { repeated Row rows = 1; }
+
+message Row { repeated Value values = 1; }
+
+message Value {
+  oneof value {
+    bool bool = 1;
+    sint32 i32 = 2;
+    sint64 i64 = 3;
+    float f32 = 4;
+    double f64 = 5;
+    string string = 6;
+    bytes Bytes = 7;
+  }
+}

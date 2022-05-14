@@ -1,0 +1,12 @@
+[package]
+name = "rdbms-gateway"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-trait = "0.1.53"
+tonic = "0.7.2"
+prost = "0.10.3"
+
+[build-dependencies]
+tonic-build = "0.7.2"
