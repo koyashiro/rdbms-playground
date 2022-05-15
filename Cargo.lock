@@ -754,7 +754,6 @@ checksum = "e5ce46fe64a9d73be07dcbe690a38ce1b293be448fd8ce1e6c1b8062c9f72c6a"
 name = "mysql-gateway"
 version = "0.1.0"
 dependencies = [
- "async-trait",
  "rdbms-gateway",
  "sqlx",
  "tokio",
@@ -966,7 +965,6 @@ checksum = "1df8c4ec4b0627e53bdf214615ad287367e482558cf84b109250b37464dc03ae"
 name = "postgres-gateway"
 version = "0.1.0"
 dependencies = [
- "async-trait",
  "rdbms-gateway",
  "sqlx",
  "tokio",
@@ -1333,7 +1331,6 @@ dependencies = [
 name = "sqlite-gateway"
 version = "0.1.0"
 dependencies = [
- "async-trait",
  "rdbms-gateway",
  "sqlx",
  "tokio",
