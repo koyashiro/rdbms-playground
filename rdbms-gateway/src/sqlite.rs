@@ -1,8 +1,9 @@
-use rdbms_gateway::{
+use sqlx::{Row, SqlitePool, TypeInfo, ValueRef};
+
+use crate::{
     database::{Database, Value},
     execute::{Execute, ExecuteResult},
 };
-use sqlx::{Row, SqlitePool, TypeInfo, ValueRef};
 
 #[derive(Debug)]
 pub struct Sqlite;
@@ -115,3 +116,4 @@ mod tests {
         );
     }
 }
+

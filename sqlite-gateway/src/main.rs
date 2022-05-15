@@ -1,14 +1,11 @@
-mod execute;
-
 use std::sync::Arc;
 
 use rdbms_gateway::{
     proto::rdbms_gateway_service_server::RdbmsGatewayServiceServer, server::RdbmsGatewayService,
+    sqlite::SqliteExecute,
 };
 use sqlx::sqlite::SqlitePoolOptions;
 use tonic::transport::Server;
-
-use crate::execute::SqliteExecute;
 
 #[tokio::main]
 async fn main() {

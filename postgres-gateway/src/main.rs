@@ -1,14 +1,11 @@
-mod execute;
-
 use std::sync::Arc;
 
 use rdbms_gateway::{
-    proto::rdbms_gateway_service_server::RdbmsGatewayServiceServer, server::RdbmsGatewayService,
+    postgres::PgExecute, proto::rdbms_gateway_service_server::RdbmsGatewayServiceServer,
+    server::RdbmsGatewayService,
 };
 use sqlx::postgres::PgPoolOptions;
 use tonic::transport::Server;
-
-use crate::execute::PgExecute;
 
 #[tokio::main]
 async fn main() {

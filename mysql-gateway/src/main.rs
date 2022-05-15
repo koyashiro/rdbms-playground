@@ -1,14 +1,11 @@
-mod execute;
-
 use std::sync::Arc;
 
 use rdbms_gateway::{
-    proto::rdbms_gateway_service_server::RdbmsGatewayServiceServer, server::RdbmsGatewayService,
+    mysql::MySqlExecute, proto::rdbms_gateway_service_server::RdbmsGatewayServiceServer,
+    server::RdbmsGatewayService,
 };
 use sqlx::mysql::MySqlPoolOptions;
 use tonic::transport::Server;
-
-use crate::execute::MySqlExecute;
 
 #[tokio::main]
 async fn main() {
