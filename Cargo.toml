@@ -2,5 +2,6 @@
 members = [
     "rdbms-gateway",
     "mysql-gateway",
+    "postgres-gateway",
     "sqlite-gateway",
 ]
