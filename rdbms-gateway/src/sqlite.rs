@@ -1,8 +1,8 @@
 use sqlx::{Row, SqlitePool, TypeInfo, ValueRef};
 
 use crate::{
-    database::{Database, Value},
-    execute::{Execute, ExecuteResult},
+    database::Database,
+    execute::{Execute, ExecuteResult, Value},
 };
 
 #[derive(Debug)]
@@ -116,4 +116,3 @@ mod tests {
         );
     }
 }
-

@@ -4,8 +4,7 @@ use tonic::{Response, Status};
 
 use crate::{
     database::Database,
-    database::Value,
-    execute::{Execute, ExecuteResult},
+    execute::{Execute, ExecuteResult, Value},
     proto,
 };
 

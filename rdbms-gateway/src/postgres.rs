@@ -1,6 +1,6 @@
 use crate::{
-    database::{Database, Value},
-    execute::{Execute, ExecuteResult},
+    database::Database,
+    execute::{Execute, ExecuteResult, Value},
 };
 use sqlx::{PgPool, Row, TypeInfo, ValueRef};
 
