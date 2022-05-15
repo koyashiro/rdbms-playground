@@ -6,8 +6,15 @@ end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-[{*.go,go.mod}]
-charset = utf-8
-end_of_line = lf
-indent_style = tab
+[{*.rs,Cargo.toml}]
+indent_style = space
 indent_size = 4
+
+[*.md]
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = false
+
+[*.proto]
+indent_style = space
+indent_size = 2
