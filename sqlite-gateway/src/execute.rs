@@ -2,7 +2,7 @@ use rdbms_gateway::{
     database::{Database, Value},
     execute::{Execute, ExecuteResult},
 };
-use sqlx::{Column, Row, SqlitePool, TypeInfo};
+use sqlx::{Row, SqlitePool, TypeInfo, ValueRef};
 
 #[derive(Debug)]
 pub struct Sqlite;
@@ -30,22 +30,24 @@ impl Execute<Sqlite> for SqliteExecute {
         let rows = rows
             .iter()
             .map(|row| {
-                let values = row
-                    .columns()
-                    .iter()
-                    .enumerate()
-                    .map(|(i, column)| {
-                        let value = match column.type_info().name() {
-                            "INTEGER" => Value::I64(row.get_unchecked(i)),
-                            "REAL" => Value::F64(row.get_unchecked(i)),
-                            "TEXT" => Value::String(row.get_unchecked(i)),
-                            "BLOB" => Value::Bytes(row.get_unchecked(i)),
-                            _ => unreachable!(),
-                        };
-                        Some(value)
+                (0..row.columns().len())
+                    .map(|i| {
+                        let value = row.try_get_raw(i).unwrap();
+                        if value.is_null() {
+                            None
+                        } else {
+                            let type_info = value.type_info();
+                            let type_name = type_info.name();
+                            Some(match type_name {
+                                "INTEGER" => Value::I64(row.get_unchecked(i)),
+                                "REAL" => Value::F64(row.get_unchecked(i)),
+                                "TEXT" => Value::String(row.get_unchecked(i)),
+                                "BLOB" => Value::Bytes(row.get_unchecked(i)),
+                                _ => todo!("unexpected column type: {type_name}"),
+                            })
+                        }
                     })
-                    .collect();
-                values
+                    .collect()
             })
             .collect();
 
@@ -107,12 +109,7 @@ mod tests {
                             0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07
                         ])),
                     ],
-                    vec![
-                        Some(Value::I64(0_i64)),
-                        Some(Value::F64(0_f64)),
-                        Some(Value::String("".to_owned())),
-                        Some(Value::Bytes(Vec::new())),
-                    ],
+                    vec![None, None, None, None,],
                 ]
             }
         );

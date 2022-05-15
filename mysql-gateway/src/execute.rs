@@ -2,7 +2,7 @@ use rdbms_gateway::{
     database::{Database, Value},
     execute::{Execute, ExecuteResult},
 };
-use sqlx::{Column, MySqlPool, Row, TypeInfo};
+use sqlx::{MySqlPool, Row, TypeInfo, ValueRef};
 
 #[derive(Debug)]
 pub struct MySql;
@@ -30,38 +30,37 @@ impl Execute<MySql> for MySqlExecute {
         let rows = rows
             .iter()
             .map(|row| {
-                let values = row
-                    .columns()
-                    .iter()
-                    .enumerate()
-                    .map(|(i, column)| {
-                        let column_type_name = column.type_info().name();
-                        match column_type_name {
-                            "BOOLEAN" => Some(Value::Bool(row.get_unchecked(i))),
-                            "TINYINT" => Some(Value::I8(row.get_unchecked(i))),
-                            "SMALLINT" => Some(Value::I16(row.get_unchecked(i))),
-                            "MEDIUMINT" | "INT" => Some(Value::I32(row.get_unchecked(i))),
-                            "BIGINT" => Some(Value::I64(row.get_unchecked(i))),
-                            "TINYINT UNSIGNED" => Some(Value::U8(row.get_unchecked(i))),
-                            "SMALLINT UNSIGNED" => Some(Value::U16(row.get_unchecked(i))),
-                            "MEDIUMINT UNSIGNED" | "INT UNSIGNED" => {
-                                Some(Value::U32(row.get_unchecked(i)))
-                            }
-                            "BIGINT UNSIGNED" => Some(Value::U64(row.get_unchecked(i))),
-                            "FLOAT" => Some(Value::F32(row.get_unchecked(i))),
-                            "DOUBLE" => Some(Value::F64(row.get_unchecked(i))),
-                            "CHAR" | "VARCHAR" | "TEXT" => {
-                                Some(Value::String(row.get_unchecked(i)))
-                            }
-                            "BINARY" | "VARBINARY" | "BLOB" => {
-                                Some(Value::Bytes(row.get_unchecked(i)))
-                            }
-                            "NULL" => None,
-                            _ => todo!("unexpected column type: {column_type_name}"),
+                (0..row.columns().len())
+                    .map(|i| {
+                        let value = row.try_get_raw(i).unwrap();
+                        if value.is_null() {
+                            None
+                        } else {
+                            let type_info = value.type_info();
+                            let type_name = type_info.name();
+                            Some(match type_name {
+                                "BOOLEAN" => Value::Bool(row.get_unchecked(i)),
+                                "TINYINT" => Value::I8(row.get_unchecked(i)),
+                                "SMALLINT" => Value::I16(row.get_unchecked(i)),
+                                "MEDIUMINT" | "INT" => Value::I32(row.get_unchecked(i)),
+                                "BIGINT" => Value::I64(row.get_unchecked(i)),
+                                "TINYINT UNSIGNED" => Value::U8(row.get_unchecked(i)),
+                                "SMALLINT UNSIGNED" => Value::U16(row.get_unchecked(i)),
+                                "MEDIUMINT UNSIGNED" | "INT UNSIGNED" => {
+                                    Value::U32(row.get_unchecked(i))
+                                }
+                                "BIGINT UNSIGNED" => Value::U64(row.get_unchecked(i)),
+                                "FLOAT" => Value::F32(row.get_unchecked(i)),
+                                "DOUBLE" => Value::F64(row.get_unchecked(i)),
+                                "CHAR" | "VARCHAR" | "TEXT" => Value::String(row.get_unchecked(i)),
+                                "BINARY" | "VARBINARY" | "BLOB" => {
+                                    Value::Bytes(row.get_unchecked(i))
+                                }
+                                _ => todo!("unexpected column type: {type_name}"),
+                            })
                         }
                     })
-                    .collect();
-                values
+                    .collect()
             })
             .collect();
 
