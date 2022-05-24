@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "rdbmspg",
     "rdbms-gateway",
     "mysql-gateway",
     "postgres-gateway",
