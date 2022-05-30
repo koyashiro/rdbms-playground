@@ -8,9 +8,12 @@ anyhow = "1.0.57"
 async-trait = "0.1.53"
 axum = "0.5.6"
 docker-api = "0.8.0"
+futures = "0.3.21"
 serde = "1.0.137"
-sqlx = { version = "0.5.13", features = ["mysql", "postgres"] }
+sqlparser = "0.17.0"
+sqlx = { version = "0.5.13", features = ["mysql", "postgres", "sqlite"] }
 thiserror = "1.0.31"
 # hyper = { version = "0.14.18", features = ["full"] }
 tokio = { version = "1.18.2", features = ["full"] }
+tokio-postgres = "0.7.6"
 # tower = "0.4.12"
