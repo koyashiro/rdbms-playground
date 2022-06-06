@@ -14,6 +14,6 @@ sqlparser = "0.17.0"
 sqlx = { version = "0.5.13", features = ["mysql", "postgres", "sqlite"] }
 thiserror = "1.0.31"
 # hyper = { version = "0.14.18", features = ["full"] }
-tokio = { version = "1.19.1", features = ["full"] }
+tokio = { version = "1.19.2", features = ["full"] }
 tokio-postgres = "0.7.6"
 # tower = "0.4.12"
