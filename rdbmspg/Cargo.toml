@@ -11,7 +11,7 @@ docker-api = "0.8.0"
 futures = "0.3.21"
 serde = "1.0.137"
 sqlparser = "0.18.0"
-sqlx = { version = "0.5.13", features = ["mysql", "postgres", "sqlite"] }
+sqlx = { version = "0.6.0", features = ["mysql", "postgres", "sqlite"] }
 thiserror = "1.0.31"
 # hyper = { version = "0.14.18", features = ["full"] }
 tokio = { version = "1.19.2", features = ["full"] }
