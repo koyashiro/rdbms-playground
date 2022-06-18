@@ -7,7 +7,7 @@ edition = "2021"
 async-trait = "0.1.56"
 tonic = "0.7.2"
 prost = "0.10.4"
-sqlx = { version = "0.5.13", features = ["runtime-tokio-rustls"] }
+sqlx = { version = "0.6.0", features = ["runtime-tokio-rustls"] }
 
 [build-dependencies]
 tonic-build = "0.7.2"
